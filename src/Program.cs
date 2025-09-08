@@ -1,0 +1,164 @@
+using Microsoft.EntityFrameworkCore;
+using VideoProcessingApi.Data;
+using VideoProcessingApi.Services;
+using VideoProcessingApi.Interfaces;
+using VideoProcessingApi.BackgroundServices;
+using VideoProcessingApi.Configuration;
+using VideoProcessingApi.Middleware;
+using Serilog;
+using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Configurar Serilog
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("logs/api-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
+// Configurações
+builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("Api"));
+builder.Services.Configure<FFmpegSettings>(builder.Configuration.GetSection("FFmpeg"));
+builder.Services.Configure<SecuritySettings>(builder.Configuration.GetSection("Security"));
+
+// Entity Framework
+builder.Services.AddDbContext<JobDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Serviços
+builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IFFmpegService, FFmpegService>();
+builder.Services.AddScoped<FFmpegHealthCheck>();
+
+// Background Services
+builder.Services.AddHostedService<VideoProcessingBackgroundService>();
+builder.Services.AddHostedService<CleanupBackgroundService>();
+
+// Controllers e JSON
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    });
+
+// Swagger/OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "Video Processing API", 
+        Version = "v1",
+        Description = "API para processamento assíncrono de vídeos usando FFmpeg"
+    });
+    
+    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+    {
+        Description = "API Key needed to access the endpoints",
+        In = ParameterLocation.Header,
+        Name = "X-API-Key",
+        Type = SecuritySchemeType.ApiKey
+    });
+    
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "ApiKey"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DefaultPolicy", policy =>
+    {
+        var corsSettings = builder.Configuration.GetSection("Security:Cors").Get<CorsSettings>();
+        policy.WithOrigins(corsSettings?.AllowedOrigins ?? new[] { "*" })
+              .WithMethods(corsSettings?.AllowedMethods ?? new[] { "GET", "POST", "PUT", "DELETE" })
+              .WithHeaders(corsSettings?.AllowedHeaders ?? new[] { "*" });
+    });
+});
+
+// Health Checks
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<JobDbContext>()
+    .AddCheck<FFmpegHealthCheck>("ffmpeg");
+
+var app = builder.Build();
+
+// Middleware pipeline
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Video Processing API V1");
+        c.RoutePrefix = "swagger";
+    });
+}
+
+// Middleware customizado
+app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<ApiKeyMiddleware>();
+app.UseMiddleware<RateLimitingMiddleware>();
+
+// Configurar HTTPS condicionalmente
+var useHttpsRedirection = builder.Configuration.GetValue<bool>("UseHttpsRedirection", false);
+if (useHttpsRedirection)
+{
+    app.UseHttpsRedirection();
+}
+
+app.UseCors("DefaultPolicy");
+
+// Security headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    await next();
+});
+
+app.UseAuthorization();
+app.MapControllers();
+app.MapHealthChecks("/health");
+
+// Garantir que o banco de dados seja criado
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<JobDbContext>();
+    context.Database.EnsureCreated();
+}
+
+try
+{
+    Log.Information("Iniciando aplicação Video Processing API");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Aplicação falhou ao iniciar");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
