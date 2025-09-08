@@ -1,0 +1,35 @@
+services:
+  video-processing-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+      - "5001:443"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./processed:/app/processed
+      - ./db:/app/db
+      - ./logs:/app/logs
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/app/db/jobs.db
+      - FFmpeg__BinaryPath=/usr/bin/ffmpeg
+      - Security__ApiKeys__0=your-api-key-here
+      - Logging__LogLevel__Default=Information
+      - RateLimit__MaxRequestsPerMinute=30
+    depends_on:
+      - ffmpeg-service
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ffmpeg-service:
+    image: jrottenberg/ffmpeg:4.4-alpine
+    command: ["sleep", "infinity"]
+    volumes:
+      - ./uploads:/uploads
+      - ./processed:/processed

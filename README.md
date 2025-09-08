@@ -40,8 +40,9 @@ Uma API simples e poderosa para processamento de vídeos usando FFmpeg. Faça me
    ```
 
 4. **Acesse a API**:
-   - API: http://localhost:8080
-   - Documentação: http://localhost:8080/swagger
+   - API: http://localhost:5000 (HTTP por padrão)
+   - Documentação: http://localhost:5000/swagger
+   - Para HTTPS: https://localhost:5001 (se habilitado)
 
 ## 📖 Como Usar
 
@@ -55,7 +56,7 @@ Por padrão, use uma das chaves configuradas:
 
 #### Merge de Vídeos
 ```bash
-curl -X POST "http://localhost:8080/api/jobs" \
+curl -X POST "http://localhost:5000/api/jobs" \
   -H "X-API-Key: dev-key-12345" \
   -F "processingType=Merge" \
   -F "files=@video1.mp4" \
@@ -64,7 +65,7 @@ curl -X POST "http://localhost:8080/api/jobs" \
 
 #### Conversão de Formato
 ```bash
-curl -X POST "http://localhost:8080/api/jobs" \
+curl -X POST "http://localhost:5000/api/jobs" \
   -H "X-API-Key: dev-key-12345" \
   -F "processingType=Convert" \
   -F "files=@video.avi" \
@@ -73,7 +74,7 @@ curl -X POST "http://localhost:8080/api/jobs" \
 
 #### Compressão
 ```bash
-curl -X POST "http://localhost:8080/api/jobs" \
+curl -X POST "http://localhost:5000/api/jobs" \
   -H "X-API-Key: dev-key-12345" \
   -F "processingType=Compress" \
   -F "files=@video.mp4" \
@@ -83,7 +84,7 @@ curl -X POST "http://localhost:8080/api/jobs" \
 ### 3. Consultar Status do Job
 
 ```bash
-curl -X GET "http://localhost:8080/api/jobs/{job-id}/status" \
+curl -X GET "http://localhost:5000/api/jobs/{job-id}/status" \
   -H "X-API-Key: dev-key-12345"
 ```
 
@@ -92,7 +93,7 @@ curl -X GET "http://localhost:8080/api/jobs/{job-id}/status" \
 Quando o status for `Completed`, use o link fornecido na resposta:
 
 ```bash
-curl -X GET "http://localhost:8080/api/jobs/{job-id}/download" \
+curl -X GET "http://localhost:5000/api/jobs/{job-id}/download" \
   -H "X-API-Key: dev-key-12345" \
   -o video_processado.mp4
 ```
@@ -133,6 +134,50 @@ curl -X GET "http://localhost:8080/api/jobs/{job-id}/download" \
 - `Canceled` - Cancelado pelo usuário
 
 ## 🛠️ Configuração Avançada
+
+### Configuração HTTPS
+
+Por padrão, a aplicação roda apenas em HTTP. Para habilitar HTTPS:
+
+**Desenvolvimento (appsettings.Development.json):**
+```json
+{
+  "UseHttpsRedirection": false,
+  "Kestrel": {
+    "EndPoints": {
+      "Http": {
+        "Url": "http://localhost:5000"
+      }
+    }
+  }
+}
+```
+
+**Produção (appsettings.Production.json):**
+```json
+{
+  "UseHttpsRedirection": true,
+  "Kestrel": {
+    "EndPoints": {
+      "Http": {
+        "Url": "http://localhost:5000"
+      },
+      "Https": {
+        "Url": "https://localhost:5001",
+        "Certificate": {
+          "Path": "certificate.pfx",
+          "Password": "YourCertificatePassword"
+        }
+      }
+    }
+  }
+}
+```
+
+> **💡 Dica**: Para gerar um certificado de desenvolvimento, use:
+> ```bash
+> dotnet dev-certs https --export-path certificate.pfx --password YourPassword
+> ```
 
 ### Variáveis de Ambiente
 
@@ -180,13 +225,13 @@ Os logs ficam disponíveis em:
 ### Verificar Saúde da API
 
 ```bash
-curl http://localhost:8080/health
+curl http://localhost:5000/health
 ```
 
 ### Cancelar um Job
 
 ```bash
-curl -X DELETE "http://localhost:8080/api/jobs/{job-id}" \
+curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
   -H "X-API-Key: dev-key-12345"
 ```
 
@@ -217,7 +262,7 @@ curl -X DELETE "http://localhost:8080/api/jobs/{job-id}" \
     
     <script>
         const API_KEY = 'dev-key-12345';
-        const API_URL = 'http://localhost:8080/api';
+        const API_URL = 'http://localhost:5000/api';
         
         document.getElementById('uploadForm').onsubmit = async (e) => {
             e.preventDefault();
@@ -275,8 +320,8 @@ curl -X DELETE "http://localhost:8080/api/jobs/{job-id}" \
 ## 📞 Suporte
 
 - **Logs**: `docker-compose logs -f video-processing-api`
-- **Health Check**: `http://localhost:8080/health`
-- **Documentação**: `http://localhost:8080/swagger`
+- **Health Check**: `http://localhost:5000/health`
+- **Documentação**: `http://localhost:5000/swagger`
 
 ## 📄 Licença
 
