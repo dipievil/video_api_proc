@@ -21,7 +21,10 @@ public class VideoProcessingBackgroundService : BackgroundService
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
-        _semaphore = new SemaphoreSlim(apiSettings.Value.MaxConcurrentJobs, apiSettings.Value.MaxConcurrentJobs);
+        
+        // Garantir que MaxConcurrentJobs seja pelo menos 1
+        var maxJobs = Math.Max(1, apiSettings.Value.MaxConcurrentJobs);
+        _semaphore = new SemaphoreSlim(maxJobs, maxJobs);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

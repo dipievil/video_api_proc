@@ -15,7 +15,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__DefaultConnection=Data Source=/app/db/jobs.db
+      - ConnectionStrings__APIDBConnection=Data Source=/app/db/jobs.db
       - FFmpeg__BinaryPath=/usr/bin/ffmpeg
       - Security__ApiKeys__0=your-api-key-here
       - Logging__LogLevel__Default=Information

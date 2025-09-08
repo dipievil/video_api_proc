@@ -190,7 +190,7 @@ services:
       - ./logs:/app/logs
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Data Source=/app/db/jobs.db
+      - ConnectionStrings__APIDBConnection=Data Source=/app/db/jobs.db
       - FFmpeg__BinaryPath=/usr/bin/ffmpeg
       - Security__ApiKeys__0=your-api-key-here
       - Logging__LogLevel__Default=Information
@@ -885,7 +885,7 @@ builder.Services.Configure<SecuritySettings>(builder.Configuration.GetSection("S
 
 // Entity Framework
 builder.Services.AddDbContext<JobDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("APIDBConnection")));
 
 // Serviços
 builder.Services.AddScoped<IJobService, JobService>();
@@ -1100,7 +1100,7 @@ ENTRYPOINT ["dotnet", "VideoProcessingApi.dll"]
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "DefaultConnection": "Data Source=db/jobs.db"
+    "APIDBConnection": "Data Source=db/jobs.db"
   },
   "Api": {
     "AllowedFileTypes": [".mp4", ".avi", ".mov", ".mkv", ".wmv", ".flv"],
@@ -1296,7 +1296,7 @@ services:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/cert.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
-      - ConnectionStrings__DefaultConnection=Data Source=/app/db/jobs.db
+      - ConnectionStrings__APIDBConnection=Data Source=/app/db/jobs.db
     env_file:
       - .env.production
     restart: unless-stopped
