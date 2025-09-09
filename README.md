@@ -2,6 +2,8 @@
 
 Uma API simples e poderosa para processamento de vídeos usando FFmpeg. Faça merge, conversão, compressão e corte de vídeos de forma assíncrona.
 
+> 🇺🇸 **[English version available here](README.en.md)**
+
 ## ✨ Funcionalidades
 
 - **📁 Upload de Múltiplos Vídeos**: Envie vários arquivos de uma vez
