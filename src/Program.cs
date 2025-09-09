@@ -103,6 +103,13 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
+// Ensure database is created before any background services start
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<JobDbContext>();
+    context.Database.EnsureCreated();
+}
+
 // Middleware pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -141,13 +148,6 @@ app.Use(async (context, next) =>
 app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
-
-// Garantir que o banco de dados seja criado
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<JobDbContext>();
-    context.Database.EnsureCreated();
-}
 
 try
 {
