@@ -312,6 +312,157 @@ curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
 </html>
 ```
 
+## 🧪 Testes de Integração
+
+Este projeto inclui testes de integração abrangentes que testam todos os fluxos principais de processamento de vídeo usando Docker Compose para simular um ambiente real.
+
+### 📋 Pré-requisitos para Testes
+
+- Docker e Docker Compose instalados
+- .NET 8 SDK
+- Pelo menos 4GB de RAM disponível
+- 2GB de espaço em disco livre
+
+### 🚀 Executando os Testes
+
+#### Linux/macOS
+```bash
+# Executar todos os testes de integração
+./scripts/run-integration-tests.sh
+
+# Executar testes específicos (por exemplo, apenas testes de merge)
+./scripts/run-integration-tests.sh VideoMerge
+
+# Executar testes de um tipo específico
+./scripts/run-integration-tests.sh Compress
+```
+
+#### Windows
+```powershell
+# Executar todos os testes de integração
+.\scripts\run-integration-tests.ps1
+
+# Executar testes específicos
+.\scripts\run-integration-tests.ps1 -TestPattern "VideoMerge"
+```
+
+#### Manual (para desenvolvimento)
+```bash
+# 1. Construir o projeto de testes
+dotnet build tests/VideoProcessingApi.IntegrationTests/
+
+# 2. Executar os testes
+dotnet test tests/VideoProcessingApi.IntegrationTests/ --logger "console;verbosity=normal"
+```
+
+### 🎯 Cobertura dos Testes
+
+Os testes de integração cobrem:
+
+#### ✅ Operações de Processamento
+- **Merge de Vídeos**: Junção de múltiplos arquivos MP4
+- **Conversão de Formato**: MP4 → AVI, diferentes qualidades
+- **Compressão**: Redução de bitrate e tamanho
+- **Corte de Vídeo**: Extração de trechos específicos
+- **Extração de Áudio**: MP3, WAV, AAC
+
+#### ✅ Gestão de Jobs
+- Criação de jobs de processamento
+- Consulta de status em tempo real
+- Download de resultados processados
+- Cancelamento de jobs pendentes
+
+#### ✅ Cenários de Erro
+- Jobs inexistentes
+- Downloads de jobs não completos
+- Validação de parâmetros
+
+### 🔧 Configuração de Teste
+
+Os testes usam um ambiente Docker isolado com:
+- **API na porta 5002** (para evitar conflitos)
+- **MinIO na porta 9002/9003** (storage de teste)
+- **API Key de teste**: `test-api-key-12345`
+- **Dados isolados** em `./tests/` (auto-cleanup)
+
+### 📁 Estrutura dos Testes
+
+```
+tests/
+├── VideoProcessingApi.IntegrationTests/
+│   ├── Infrastructure/
+│   │   ├── DockerComposeFixture.cs      # Gerenciamento do Docker
+│   │   ├── ApiTestClient.cs             # Cliente HTTP para testes
+│   │   └── IntegrationTestBase.cs       # Classe base dos testes
+│   └── Tests/
+│       ├── VideoMergeTests.cs           # Testes de merge
+│       ├── VideoConvertTests.cs         # Testes de conversão
+│       ├── VideoCompressTests.cs        # Testes de compressão
+│       ├── VideoTrimTests.cs            # Testes de corte
+│       ├── AudioExtractionTests.cs      # Testes de extração
+│       └── JobDownloadTests.cs          # Testes de download
+└── videos/
+    └── test_video.mp4                   # Vídeo usado nos testes
+```
+
+### 🚨 Troubleshooting dos Testes
+
+**❌ Erro: Docker não encontrado**
+```bash
+# Instalar Docker no Ubuntu/Debian
+sudo apt update && sudo apt install docker.io docker-compose
+sudo usermod -aG docker $USER
+# Fazer logout e login novamente
+```
+
+**❌ Erro: Permissão negada no Docker**
+```bash
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+# Reiniciar o terminal
+```
+
+**❌ Testes falhando por timeout**
+- Aumentar recursos do Docker (4GB+ RAM)
+- Verificar se não há outros containers consumindo recursos
+- Aguardar o download inicial das imagens Docker
+
+**❌ Porta 5002 em uso**
+```bash
+# Verificar processo usando a porta
+sudo lsof -i :5002
+# Parar containers antigos
+docker-compose -f docker-compose.test.yml down --volumes
+```
+
+### 📊 Exemplo de Saída dos Testes
+
+```
+🎬 Video Processing API - Integration Tests
+=============================================
+✅ Prerequisites check passed
+🧹 Cleaning up existing test environment...
+🔧 Building test project...
+🧪 Running all integration tests...
+
+Test run for VideoProcessingApi.IntegrationTests.dll (.NETCoreApp,Version=v8.0)
+Starting test execution, please wait...
+
+[xUnit.net 00:00:00.00] Starting: VideoProcessingApi.IntegrationTests
+[xUnit.net 00:00:05.23] VideoProcessingApi.IntegrationTests.Tests.VideoMergeTests.CreateMergeJob_WithMultipleVideos_ShouldReturnSuccess [PASS]
+[xUnit.net 00:00:08.45] VideoProcessingApi.IntegrationTests.Tests.VideoConvertTests.CreateConvertJob_WithOutputFormat_ShouldReturnSuccess [PASS]
+...
+
+Test Run Successful.
+Total tests: 15
+     Passed: 15
+     Failed: 0
+     Skipped: 0
+     Total time: 2.5 Minutes
+
+✅ All integration tests passed!
+```
+
 ## 🔒 Segurança
 
 - Use HTTPS em produção

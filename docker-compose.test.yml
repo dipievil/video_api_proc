@@ -1,0 +1,57 @@
+services:
+  video-processing-api-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5002:80"  # Use different port to avoid conflicts
+    volumes:
+      - ./tests/uploads:/app/uploads
+      - ./tests/processed:/app/processed
+      - ./tests/db:/app/db
+      - ./tests/logs:/app/logs
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/app/db/jobs.db
+      - FFmpeg__BinaryPath=/usr/bin/ffmpeg
+      - Security__ApiKeys__0=test-api-key-12345
+      - Security__ApiKeys__1=dev-key-12345
+      - Logging__LogLevel__Default=Information
+      - RateLimit__MaxRequestsPerMinute=100
+    depends_on:
+      - ffmpeg-service-test
+    restart: "no"  # Don't restart for tests
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  ffmpeg-service-test:
+    image: jrottenberg/ffmpeg:4.4-alpine
+    command: ["sleep", "infinity"]
+    volumes:
+      - ./tests/uploads:/uploads
+      - ./tests/processed:/processed
+
+  minio-test:
+    image: minio/minio:latest
+    ports:
+      - "9002:9000"  # Use different port to avoid conflicts
+      - "9003:9001"
+    environment:
+      - MINIO_ROOT_USER=testuser
+      - MINIO_ROOT_PASSWORD=testpass123
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_test_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  minio_test_data:
