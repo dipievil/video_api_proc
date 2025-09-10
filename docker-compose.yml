@@ -1,5 +1,6 @@
 services:
   video-processing-api:
+    container_name: viprocAPI
     build:
       context: .
       dockerfile: Dockerfile
@@ -29,6 +30,7 @@ services:
 
   ffmpeg-service:
     image: jrottenberg/ffmpeg:4.4-alpine
+    container_name: viprocAPI_ffmpeg
     command: ["sleep", "infinity"]
     volumes:
       - ./uploads:/uploads
@@ -36,6 +38,7 @@ services:
 
   minio:
     image: minio/minio:latest
+    container_name: viprocAPI_storage
     ports:
       - "9000:9000"
       - "9001:9001"
