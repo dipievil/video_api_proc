@@ -51,15 +51,16 @@ Uma API simples e poderosa para processamento de vídeos usando FFmpeg. Faça me
 ### 1. Obter uma API Key
 
 Por padrão, use uma das chaves configuradas:
-- `dev-key-12345` (desenvolvimento)
-- `prod-key-67890` (produção)
+- `CHANGE-ME-CHANGE-ME-dev-key-12345` (desenvolvimento - **mude em produção!**)
+
+⚠️ **IMPORTANTE**: Sempre altere as API Keys padrão antes de usar em produção!
 
 ### 2. Fazer Upload e Processar Vídeos
 
 #### Merge de Vídeos
 ```bash
 curl -X POST "http://localhost:5000/api/jobs" \
-  -H "X-API-Key: dev-key-12345" \
+  -H "X-API-Key: CHANGE-ME-CHANGE-ME-dev-key-12345" \
   -F "processingType=Merge" \
   -F "files=@video1.mp4" \
   -F "files=@video2.mp4"
@@ -68,7 +69,7 @@ curl -X POST "http://localhost:5000/api/jobs" \
 #### Conversão de Formato
 ```bash
 curl -X POST "http://localhost:5000/api/jobs" \
-  -H "X-API-Key: dev-key-12345" \
+  -H "X-API-Key: CHANGE-ME-dev-key-12345" \
   -F "processingType=Convert" \
   -F "files=@video.avi" \
   -F "options={\"outputFormat\":\"mp4\",\"quality\":\"medium\"}"
@@ -77,7 +78,7 @@ curl -X POST "http://localhost:5000/api/jobs" \
 #### Compressão
 ```bash
 curl -X POST "http://localhost:5000/api/jobs" \
-  -H "X-API-Key: dev-key-12345" \
+  -H "X-API-Key: CHANGE-ME-dev-key-12345" \
   -F "processingType=Compress" \
   -F "files=@video.mp4" \
   -F "options={\"quality\":\"low\",\"bitrateKbps\":1000}"
@@ -87,7 +88,7 @@ curl -X POST "http://localhost:5000/api/jobs" \
 
 ```bash
 curl -X GET "http://localhost:5000/api/jobs/{job-id}/status" \
-  -H "X-API-Key: dev-key-12345"
+  -H "X-API-Key: CHANGE-ME-dev-key-12345"
 ```
 
 ### 4. Baixar o Resultado
@@ -96,7 +97,7 @@ Quando o status for `Completed`, use o link fornecido na resposta:
 
 ```bash
 curl -X GET "http://localhost:5000/api/jobs/{job-id}/download" \
-  -H "X-API-Key: dev-key-12345" \
+  -H "X-API-Key: CHANGE-ME-dev-key-12345" \
   -o video_processado.mp4
 ```
 
@@ -181,6 +182,31 @@ Por padrão, a aplicação roda apenas em HTTP. Para habilitar HTTPS:
 > dotnet dev-certs https --export-path certificate.pfx --password YourPassword
 > ```
 
+### ⚙️ Arquivos de Configuração
+
+A aplicação oferece diferentes configurações para diferentes ambientes:
+
+| Arquivo | Quando Usar | Características |
+|---------|-------------|----------------|
+| `appsettings.json` | 🎯 **Desenvolvimento local** | User-friendly com comentários |
+| `appsettings.docker.json` | 🐳 **Docker/Containers** | Paths absolutos, baixa segurança |
+| `appsettings.Production.json` | 🚀 **Produção** | HTTPS, alta segurança |
+
+#### Como Escolher a Configuração
+
+```bash
+# Desenvolvimento local (padrão)
+dotnet run
+
+# Docker/Containers
+ASPNETCORE_ENVIRONMENT=docker docker-compose up
+
+# Produção
+ASPNETCORE_ENVIRONMENT=Production dotnet run
+```
+
+> 📖 **Para mais detalhes**, veja a [documentação completa de configuração](docs/configuration.md)
+
 ### Variáveis de Ambiente
 
 Edite o arquivo `.env` para personalizar:
@@ -234,7 +260,7 @@ curl http://localhost:5000/health
 
 ```bash
 curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
-  -H "X-API-Key: dev-key-12345"
+  -H "X-API-Key: CHANGE-ME-dev-key-12345"
 ```
 
 ## 📝 Exemplos Práticos
@@ -263,7 +289,7 @@ curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
     <div id="status"></div>
     
     <script>
-        const API_KEY = 'dev-key-12345';
+        const API_KEY = 'CHANGE-ME-dev-key-12345';
         const API_URL = 'http://localhost:5000/api';
         
         document.getElementById('uploadForm').onsubmit = async (e) => {
