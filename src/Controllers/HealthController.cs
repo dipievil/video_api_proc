@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using VideoProcessingApi.Interfaces;
+using VideoProcessingApi.DTOs;
 
 namespace VideoProcessingApi.Controllers;
 
@@ -20,7 +21,12 @@ public class HealthController : ControllerBase
         return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
     }
 
+    /// <summary>
+    /// Validates the environment and required assets for the application
+    /// </summary>
+    /// <returns>Environment validation status including database, storage, and FFmpeg availability</returns>
     [HttpGet("environment")]
+    [ProducesResponseType(typeof(EnvironmentValidationResponse), 200)]
     public async Task<IActionResult> ValidateEnvironment()
     {
         var validation = await _environmentValidationService.ValidateEnvironmentAsync();
