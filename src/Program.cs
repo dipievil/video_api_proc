@@ -59,6 +59,7 @@ builder.Services.AddDbContext<JobDbContext>(options =>
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IFFmpegService, FFmpegService>();
+builder.Services.AddScoped<IEnvironmentValidationService, EnvironmentValidationService>();
 builder.Services.AddScoped<FFmpegHealthCheck>();
 
 // Background Services
