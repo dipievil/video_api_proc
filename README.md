@@ -312,130 +312,112 @@ curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
 </html>
 ```
 
-## 🧪 Testes de Integração
+## 🧪 Integration Tests
 
-Este projeto inclui testes de integração abrangentes que testam todos os fluxos principais de processamento de vídeo usando Docker Compose para simular um ambiente real.
+This project includes comprehensive integration tests that cover all main video processing workflows using Docker Compose to simulate a realistic end-to-end environment.
 
-### 📋 Pré-requisitos para Testes
+### 📋 Test Prerequisites
 
-- Docker e Docker Compose instalados
+- Docker and Docker Compose installed
 - .NET 8 SDK
-- Pelo menos 4GB de RAM disponível
-- 2GB de espaço em disco livre
+- At least 4GB of available RAM
+- 2GB of free disk space
 
-### 🚀 Executando os Testes
+### 🚀 Running Tests
 
-#### Linux/macOS
+#### Manual execution (for development)
 ```bash
-# Executar todos os testes de integração
-./scripts/run-integration-tests.sh
-
-# Executar testes específicos (por exemplo, apenas testes de merge)
-./scripts/run-integration-tests.sh VideoMerge
-
-# Executar testes de um tipo específico
-./scripts/run-integration-tests.sh Compress
-```
-
-#### Windows
-```powershell
-# Executar todos os testes de integração
-.\scripts\run-integration-tests.ps1
-
-# Executar testes específicos
-.\scripts\run-integration-tests.ps1 -TestPattern "VideoMerge"
-```
-
-#### Manual (para desenvolvimento)
-```bash
-# 1. Construir o projeto de testes
+# 1. Build the test project
 dotnet build tests/VideoProcessingApi.IntegrationTests/
 
-# 2. Executar os testes
+# 2. Run all tests
 dotnet test tests/VideoProcessingApi.IntegrationTests/ --logger "console;verbosity=normal"
+
+# 3. Run specific tests
+dotnet test tests/VideoProcessingApi.IntegrationTests/ --filter "VideoMergeTests"
 ```
 
-### 🎯 Cobertura dos Testes
+### 🎯 Test Coverage
 
-Os testes de integração cobrem:
+Integration tests cover:
 
-#### ✅ Operações de Processamento
-- **Merge de Vídeos**: Junção de múltiplos arquivos MP4
-- **Conversão de Formato**: MP4 → AVI, diferentes qualidades
-- **Compressão**: Redução de bitrate e tamanho
-- **Corte de Vídeo**: Extração de trechos específicos
-- **Extração de Áudio**: MP3, WAV, AAC
+#### ✅ Processing Operations
+- **Video Merge**: Combining multiple MP4 files
+- **Format Conversion**: MP4 → AVI, different qualities
+- **Compression**: Bitrate reduction and size optimization
+- **Video Trimming**: Extracting specific time ranges
+- **Audio Extraction**: MP3, WAV, AAC output
 
-#### ✅ Gestão de Jobs
-- Criação de jobs de processamento
-- Consulta de status em tempo real
-- Download de resultados processados
-- Cancelamento de jobs pendentes
+#### ✅ Job Management
+- Job creation for processing
+- Real-time status monitoring
+- Downloading processed results
+- Canceling pending jobs
 
-#### ✅ Cenários de Erro
-- Jobs inexistentes
-- Downloads de jobs não completos
-- Validação de parâmetros
+#### ✅ Error Scenarios
+- Non-existent jobs
+- Downloads from incomplete jobs
+- Parameter validation
 
-### 🔧 Configuração de Teste
+### 🔧 Test Configuration
 
-Os testes usam um ambiente Docker isolado com:
-- **API na porta 5002** (para evitar conflitos)
-- **MinIO na porta 9002/9003** (storage de teste)
-- **API Key de teste**: `test-api-key-12345`
-- **Dados isolados** em `./tests/` (auto-cleanup)
+Tests use an isolated Docker environment with:
+- **API on port 5002** (to avoid conflicts)
+- **MinIO on ports 9002/9003** (test storage)
+- **Test API Key**: `test-api-key-12345`
+- **Isolated data** in `./tests/` (auto-cleanup)
 
-### 📁 Estrutura dos Testes
+### 📁 Test Structure
 
 ```
 tests/
 ├── VideoProcessingApi.IntegrationTests/
 │   ├── Infrastructure/
-│   │   ├── DockerComposeFixture.cs      # Gerenciamento do Docker
-│   │   ├── ApiTestClient.cs             # Cliente HTTP para testes
-│   │   └── IntegrationTestBase.cs       # Classe base dos testes
+│   │   ├── DockerComposeFixture.cs      # Docker management
+│   │   ├── ApiTestClient.cs             # HTTP client for tests
+│   │   └── IntegrationTestBase.cs       # Base test class
 │   └── Tests/
-│       ├── VideoMergeTests.cs           # Testes de merge
-│       ├── VideoConvertTests.cs         # Testes de conversão
-│       ├── VideoCompressTests.cs        # Testes de compressão
-│       ├── VideoTrimTests.cs            # Testes de corte
-│       ├── AudioExtractionTests.cs      # Testes de extração
-│       └── JobDownloadTests.cs          # Testes de download
+│       ├── VideoMergeTests.cs           # Merge tests
+│       ├── VideoConvertTests.cs         # Conversion tests
+│       ├── VideoCompressTests.cs        # Compression tests
+│       ├── VideoTrimTests.cs            # Trimming tests
+│       ├── AudioExtractionTests.cs      # Audio extraction tests
+│       └── JobDownloadTests.cs          # Download tests
 └── videos/
-    └── test_video.mp4                   # Vídeo usado nos testes
+    └── test_video.mp4                   # Test video file
 ```
 
-### 🚨 Troubleshooting dos Testes
+### 🚨 Test Troubleshooting
 
-**❌ Erro: Docker não encontrado**
+**❌ Error: Docker not found**
 ```bash
-# Instalar Docker no Ubuntu/Debian
+# Install Docker on Ubuntu/Debian
 sudo apt update && sudo apt install docker.io docker-compose
 sudo usermod -aG docker $USER
-# Fazer logout e login novamente
+# Logout and login again
 ```
 
-**❌ Erro: Permissão negada no Docker**
+**❌ Error: Permission denied on Docker**
 ```bash
 sudo systemctl start docker
 sudo usermod -aG docker $USER
-# Reiniciar o terminal
+# Restart terminal
 ```
 
-**❌ Testes falhando por timeout**
-- Aumentar recursos do Docker (4GB+ RAM)
-- Verificar se não há outros containers consumindo recursos
-- Aguardar o download inicial das imagens Docker
+**❌ Tests failing due to timeout**
+- Increase Docker resources (4GB+ RAM)
+- Check that no other containers are consuming resources
+- Wait for initial Docker image downloads
 
-**❌ Porta 5002 em uso**
+**❌ Port 5002 in use**
 ```bash
-# Verificar processo usando a porta
+# Check process using the port
 sudo lsof -i :5002
-# Parar containers antigos
+# Stop old containers
 docker-compose -f docker-compose.test.yml down --volumes
 ```
 
-### 📊 Exemplo de Saída dos Testes
+### 📊 Test Output Example
 
 ```
 🎬 Video Processing API - Integration Tests
