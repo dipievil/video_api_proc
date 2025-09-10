@@ -1,139 +1,139 @@
-# Guia de Configuração - appsettings.json
+# Configuration Guide - appsettings.json
 
-Este documento explica as diferentes configurações disponíveis no projeto e quando usar cada uma.
+This document explains the different configurations available in the project and when to use each one.
 
-## 📁 Arquivos de Configuração Disponíveis
+## 📁 Available Configuration Files
 
-### 1. 🎯 `appsettings.json` (Configuração Principal)
-**Quando usar**: Para desenvolvimento local, primeira configuração, ou ambientes simples.
+### 1. 🎯 `appsettings.json` (Main Configuration)
+**When to use**: For local development, first setup, or simple environments.
 
-**Características**:
-- Configuração básica e user-friendly
-- Comentários explicativos em português
-- Valores padrão seguros para desenvolvimento
-- Paths relativos para arquivos locais
-- API Keys de exemplo que devem ser alteradas
+**Features**:
+- Basic and user-friendly configuration
+- Explanatory comments in English
+- Safe default values for development
+- Relative paths for local files
+- Example API Keys that should be changed
 
-**Exemplo de uso**:
+**Usage example**:
 ```bash
-# Desenvolvimento local simples
+# Simple local development
 dotnet run
 ```
 
-### 2. 🐳 `appsettings.docker.json` (Configuração Docker)
-**Quando usar**: Para ambientes Docker/containerizados e desenvolvimento local com baixa segurança.
+### 2. 🐳 `appsettings.docker.json` (Docker Configuration)
+**When to use**: For Docker/containerized environments and local development with low security.
 
-**Características**:
-- Paths absolutos para containers (`/app/uploads`, `/app/logs`)
-- Configuração do MinIO apontando para serviço `minio:9000`
-- API Keys de exemplo para ambiente local
-- Logs direcionados para volumes Docker
-- Banco de dados em volume persistente
+**Features**:
+- Absolute paths for containers (`/app/uploads`, `/app/logs`)
+- MinIO configuration pointing to `minio:9000` service
+- Example API Keys for local environment
+- Logs directed to Docker volumes
+- Database in persistent volume
 
-**Exemplo de uso**:
+**Usage example**:
 ```bash
-# Com Docker Compose
+# With Docker Compose
 ASPNETCORE_ENVIRONMENT=Docker docker-compose up
 
-# Ou definindo diretamente
+# Or setting directly
 export ASPNETCORE_ENVIRONMENT=Docker
 dotnet run
 ```
 
-### 3. 🚀 `appsettings.Production.json` (Configuração de Produção)
-**Quando usar**: Para ambientes de produção com alta segurança.
+### 3. 🚀 `appsettings.Production.json` (Production Configuration)
+**When to use**: For production environments with high security.
 
-**Características**:
-- HTTPS habilitado
-- Logs com nível WARNING
-- Rate limits mais restritivos
-- CORS configurado para domínios específicos
-- Configurações otimizadas para performance
+**Features**:
+- HTTPS enabled
+- WARNING level logs
+- More restrictive rate limits
+- CORS configured for specific domains
+- Performance-optimized settings
 
-**Exemplo de uso**:
+**Usage example**:
 ```bash
-# Produção
+# Production
 ASPNETCORE_ENVIRONMENT=Production dotnet run
 ```
 
-### 4. 🧪 `appsettings.Development.json` (Configuração de Desenvolvimento)
-**Quando usar**: Automaticamente usado em ambiente de desenvolvimento.
+### 4. 🧪 `appsettings.Development.json` (Development Configuration)
+**When to use**: Automatically used in development environment.
 
-**Características**:
-- Configuração mínima que sobrescreve a principal
-- Storage local simplificado
-- Bucket de desenvolvimento no MinIO
+**Features**:
+- Minimal configuration that overrides the main one
+- Simplified local storage
+- Development bucket in MinIO
 
-## 🔄 Ordem de Precedência
+## 🔄 Precedence Order
 
-As configurações são aplicadas na seguinte ordem (última sobrescreve a anterior):
+Configurations are applied in the following order (last one overrides previous):
 
 1. `appsettings.json` (base)
-2. `appsettings.{Environment}.json` (específico do ambiente)
-3. Variáveis de ambiente
-4. Argumentos de linha de comando
+2. `appsettings.{Environment}.json` (environment-specific)
+3. Environment variables
+4. Command line arguments
 
-## ⚙️ Configurando o Ambiente
+## ⚙️ Configuring the Environment
 
-### Desenvolvimento Local
+### Local Development
 ```bash
-# Usa appsettings.json + appsettings.Development.json
+# Uses appsettings.json + appsettings.Development.json
 dotnet run
 ```
 
 ### Docker/Containers
 ```bash
-# Usa appsettings.json + appsettings.docker.json
+# Uses appsettings.json + appsettings.docker.json
 ASPNETCORE_ENVIRONMENT=docker docker-compose up
 ```
 
-### Produção
+### Production
 ```bash
-# Usa appsettings.json + appsettings.Production.json
+# Uses appsettings.json + appsettings.Production.json
 ASPNETCORE_ENVIRONMENT=Production dotnet run
 ```
 
-## 🔧 Principais Diferenças
+## 🔧 Key Differences
 
-| Configuração | Banco de Dados | Storage Paths | API Keys | HTTPS | Logs |
-|--------------|----------------|---------------|----------|-------|------|
-| **Principal** | `jobs.db` | Relativos (`./uploads`) | Exemplo | ❌ | Local |
-| **Docker** | `/app/db/jobs.db` | Absolutos (`/app/uploads`) | Exemplo | ❌ | Volume |
-| **Production** | `./data/video_proc.db` | - | Produção | ✅ | Local |
+| Configuration | Database | Storage Paths | API Keys | HTTPS | Logs |
+|---------------|----------|---------------|----------|-------|------|
+| **Main** | `jobs.db` | Relative (`./uploads`) | Example | ❌ | Local |
+| **Docker** | `/app/db/jobs.db` | Absolute (`/app/uploads`) | Example | ❌ | Volume |
+| **Production** | `./data/video_proc.db` | - | Production | ✅ | Local |
 | **Development** | - | `./uploads` | - | ❌ | - |
 
-## 🛡️ Segurança
+## 🛡️ Security
 
 ### ⚠️ API Keys
-**IMPORTANTE**: Sempre altere as API Keys padrão antes de usar em produção!
+**IMPORTANT**: Always change the default API Keys before using in production!
 
 ```json
 {
   "Security": {
     "ApiKeys": [
-      "sua-chave-api-aqui-segura-123456"
+      "your-secure-api-key-here-123456"
     ]
   }
 }
 ```
 
 ### 🌐 CORS
-Configure os domínios permitidos conforme seu ambiente:
+Configure allowed domains according to your environment:
 
 ```json
 {
   "Security": {
     "Cors": {
-      "AllowedOrigins": ["https://seudominio.com"]
+      "AllowedOrigins": ["https://yourdomain.com"]
     }
   }
 }
 ```
 
-## 🐛 Problemas Comuns
+## 🐛 Common Issues
 
-### FFmpeg não encontrado
-**Solução**: Configure o caminho correto:
+### FFmpeg not found
+**Solution**: Configure the correct path:
 ```json
 {
   "FFmpeg": {
@@ -143,21 +143,21 @@ Configure os domínios permitidos conforme seu ambiente:
 }
 ```
 
-### Problemas de Permissão
-**Solução**: Verifique se os diretórios existem e têm permissão de escrita:
+### Permission Problems
+**Solution**: Check if directories exist and have write permissions:
 ```bash
 mkdir -p uploads processed logs
 chmod 755 uploads processed logs
 ```
 
-### MinIO não conecta
-**Solução**: Verifique se o serviço está rodando e a configuração está correta:
+### MinIO Connection Issues
+**Solution**: Check if the service is running and configuration is correct:
 ```json
 {
   "Storage": {
     "Provider": "MinIO",
     "MinIO": {
-      "Endpoint": "localhost:9000",  // ou "minio:9000" no Docker
+      "Endpoint": "localhost:9000",  // or "minio:9000" in Docker
       "AccessKey": "minioadmin",
       "SecretKey": "minioadmin123"
     }
@@ -165,55 +165,55 @@ chmod 755 uploads processed logs
 }
 ```
 
-## 📚 Exemplos de Uso
+## 📚 Usage Examples
 
-### 1. Desenvolvimento Local Simples
+### 1. Simple Local Development
 ```bash
-# Apenas execute - usa configuração padrão
+# Just run - uses default configuration
 dotnet run
 ```
 
-### 2. Desenvolvimento com Docker
+### 2. Development with Docker
 ```bash
-# Docker Compose (recomendado)
+# Docker Compose (recommended)
 docker-compose up
 
-# Ou manual
+# Or manual
 ASPNETCORE_ENVIRONMENT=docker dotnet run
 ```
 
-### 3. Produção
+### 3. Production
 ```bash
-# Configure variáveis de ambiente primeiro
+# Configure environment variables first
 export ASPNETCORE_ENVIRONMENT=Production
-export Security__ApiKeys__0="sua-chave-super-secreta"
-export ConnectionStrings__DefaultConnection="sua-string-de-conexao"
+export Security__ApiKeys__0="your-super-secret-key"
+export ConnectionStrings__DefaultConnection="your-connection-string"
 
 dotnet run
 ```
 
-### 4. Sobrescrever Configurações
+### 4. Override Configurations
 ```bash
-# Via variáveis de ambiente
+# Via environment variables
 export FFmpeg__BinaryPath="/usr/local/bin/ffmpeg"
 export Api__MaxConcurrentJobs=5
 
 dotnet run
 ```
 
-## 🔍 Validando Configuração
+## 🔍 Validating Configuration
 
-Para verificar se sua configuração está correta:
+To check if your configuration is correct:
 
 1. **Build**: `dotnet build`
-2. **Health Check**: Acesse `http://localhost:5000/health`
-3. **Swagger**: Acesse `http://localhost:5000/swagger`
-4. **Logs**: Verifique os logs em `logs/api-{data}.txt`
+2. **Health Check**: Access `http://localhost:5000/health`
+3. **Swagger**: Access `http://localhost:5000/swagger`
+4. **Logs**: Check logs in `logs/api-{date}.txt`
 
-## 💡 Dicas
+## 💡 Tips
 
-- Use `appsettings.json` para começar
-- Mude para `appsettings.docker.json` quando usar Docker
-- Configure `appsettings.Production.json` para produção
-- Sempre use variáveis de ambiente para dados sensíveis
-- Teste cada configuração antes de fazer deploy
+- Use `appsettings.json` to get started
+- Switch to `appsettings.docker.json` when using Docker
+- Configure `appsettings.Production.json` for production
+- Always use environment variables for sensitive data
+- Test each configuration before deployment

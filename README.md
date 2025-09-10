@@ -182,30 +182,30 @@ Por padrão, a aplicação roda apenas em HTTP. Para habilitar HTTPS:
 > dotnet dev-certs https --export-path certificate.pfx --password YourPassword
 > ```
 
-### ⚙️ Arquivos de Configuração
+### ⚙️ Configuration Files
 
-A aplicação oferece diferentes configurações para diferentes ambientes:
+The application offers different configurations for different environments:
 
-| Arquivo | Quando Usar | Características |
-|---------|-------------|----------------|
-| `appsettings.json` | 🎯 **Desenvolvimento local** | User-friendly com comentários |
-| `appsettings.docker.json` | 🐳 **Docker/Containers** | Paths absolutos, baixa segurança |
-| `appsettings.Production.json` | 🚀 **Produção** | HTTPS, alta segurança |
+| File | When to Use | Features |
+|------|-------------|----------|
+| `appsettings.json` | 🎯 **Local Development** | User-friendly with comments |
+| `appsettings.docker.json` | 🐳 **Docker/Containers** | Absolute paths, low security |
+| `appsettings.Production.json` | 🚀 **Production** | HTTPS, high security |
 
-#### Como Escolher a Configuração
+#### How to Choose Configuration
 
 ```bash
-# Desenvolvimento local (padrão)
+# Local development (default)
 dotnet run
 
 # Docker/Containers
 ASPNETCORE_ENVIRONMENT=docker docker-compose up
 
-# Produção
+# Production
 ASPNETCORE_ENVIRONMENT=Production dotnet run
 ```
 
-> 📖 **Para mais detalhes**, veja a [documentação completa de configuração](docs/configuration.md)
+> 📖 **For more details**, see the [complete configuration documentation](docs/configuration.md)
 
 ### Variáveis de Ambiente
 
