@@ -19,8 +19,16 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null; then
-    echo "❌ Docker Compose is not installed. Please install Docker Compose first."
+# Check for Docker Compose (v2 or v1)
+DOCKER_COMPOSE_CMD=""
+if docker compose version &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker compose"
+    echo "✅ Docker Compose v2 found"
+elif command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker-compose"
+    echo "✅ Docker Compose v1 found"
+else
+    echo "❌ Docker Compose is not installed. Please install Docker Compose."
     exit 1
 fi
 
@@ -34,7 +42,7 @@ echo "✅ Prerequisites check passed"
 
 # Clean up any existing test containers
 echo "🧹 Cleaning up existing test environment..."
-docker-compose -f docker-compose.test.yml down --volumes --remove-orphans 2>/dev/null || true
+$DOCKER_COMPOSE_CMD -f docker-compose.test.yml down --volumes --remove-orphans 2>/dev/null || true
 
 # Remove test directories if they exist
 rm -rf tests/uploads tests/processed tests/db tests/logs 2>/dev/null || true
@@ -59,7 +67,7 @@ TEST_RESULT=$?
 
 # Clean up test environment
 echo "🧹 Cleaning up test environment..."
-docker-compose -f docker-compose.test.yml down --volumes --remove-orphans 2>/dev/null || true
+$DOCKER_COMPOSE_CMD -f docker-compose.test.yml down --volumes --remove-orphans 2>/dev/null || true
 rm -rf tests/uploads tests/processed tests/db tests/logs 2>/dev/null || true
 
 if [ $TEST_RESULT -eq 0 ]; then

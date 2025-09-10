@@ -56,12 +56,13 @@ public class DockerComposeFixture : IDisposable
 
     private async Task RunDockerComposeCommand(params string[] args)
     {
+        var dockerComposeCommand = await GetDockerComposeCommand();
         var arguments = $"-f docker-compose.test.yml {string.Join(" ", args)}";
         
         var processInfo = new ProcessStartInfo
         {
-            FileName = "docker-compose",
-            Arguments = arguments,
+            FileName = dockerComposeCommand.Item1,
+            Arguments = dockerComposeCommand.Item2 + " " + arguments,
             WorkingDirectory = GetProjectRootPath(),
             UseShellExecute = false,
             RedirectStandardOutput = true,
@@ -70,7 +71,7 @@ public class DockerComposeFixture : IDisposable
 
         using var process = Process.Start(processInfo);
         if (process == null)
-            throw new InvalidOperationException("Failed to start docker-compose process");
+            throw new InvalidOperationException($"Failed to start {dockerComposeCommand.Item1} process");
 
         var output = await process.StandardOutput.ReadToEndAsync();
         var error = await process.StandardError.ReadToEndAsync();
@@ -79,13 +80,72 @@ public class DockerComposeFixture : IDisposable
 
         if (process.ExitCode != 0)
         {
-            _logger.LogError("Docker Compose command failed: {Arguments}", arguments);
+            _logger.LogError("Docker Compose command failed: {Command} {Arguments}", dockerComposeCommand.Item1, arguments);
             _logger.LogError("Output: {Output}", output);
             _logger.LogError("Error: {Error}", error);
             throw new InvalidOperationException($"Docker Compose command failed with exit code {process.ExitCode}");
         }
 
         _logger.LogDebug("Docker Compose output: {Output}", output);
+    }
+
+    private async Task<(string, string)> GetDockerComposeCommand()
+    {
+        // Try docker compose (v2) first
+        try
+        {
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = "docker",
+                Arguments = "compose version",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            using var process = Process.Start(processInfo);
+            if (process != null)
+            {
+                await process.WaitForExitAsync();
+                if (process.ExitCode == 0)
+                {
+                    return ("docker", "compose");
+                }
+            }
+        }
+        catch
+        {
+            // Ignore and try next option
+        }
+
+        // Try docker-compose (v1) as fallback
+        try
+        {
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = "docker-compose",
+                Arguments = "--version",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            using var process = Process.Start(processInfo);
+            if (process != null)
+            {
+                await process.WaitForExitAsync();
+                if (process.ExitCode == 0)
+                {
+                    return ("docker-compose", "");
+                }
+            }
+        }
+        catch
+        {
+            // Ignore
+        }
+
+        throw new InvalidOperationException("Neither 'docker compose' nor 'docker-compose' is available. Please install Docker Compose.");
     }
 
     private async Task WaitForHealthyServices()

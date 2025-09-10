@@ -23,12 +23,20 @@ try {
 }
 
 # Check if Docker Compose is installed
+$DockerComposeCmd = ""
 try {
-    docker-compose --version | Out-Null
-    Write-Host "✅ Docker Compose found" -ForegroundColor Green
+    docker compose version | Out-Null
+    $DockerComposeCmd = "docker compose"
+    Write-Host "✅ Docker Compose v2 found" -ForegroundColor Green
 } catch {
-    Write-Host "❌ Docker Compose is not installed. Please install Docker Compose first." -ForegroundColor Red
-    exit 1
+    try {
+        docker-compose --version | Out-Null
+        $DockerComposeCmd = "docker-compose"
+        Write-Host "✅ Docker Compose v1 found" -ForegroundColor Green
+    } catch {
+        Write-Host "❌ Docker Compose is not installed. Please install Docker Compose." -ForegroundColor Red
+        exit 1
+    }
 }
 
 # Check if .NET 8 is installed
@@ -48,7 +56,7 @@ try {
 # Clean up any existing test containers
 Write-Host "🧹 Cleaning up existing test environment..." -ForegroundColor Yellow
 try {
-    docker-compose -f docker-compose.test.yml down --volumes --remove-orphans 2>$null
+    Invoke-Expression "$DockerComposeCmd -f docker-compose.test.yml down --volumes --remove-orphans" 2>$null
 } catch {
     # Ignore errors during cleanup
 }
@@ -85,7 +93,7 @@ $TestResult = $LASTEXITCODE
 # Clean up test environment
 Write-Host "🧹 Cleaning up test environment..." -ForegroundColor Yellow
 try {
-    docker-compose -f docker-compose.test.yml down --volumes --remove-orphans 2>$null
+    Invoke-Expression "$DockerComposeCmd -f docker-compose.test.yml down --volumes --remove-orphans" 2>$null
 } catch {
     # Ignore errors during cleanup
 }
