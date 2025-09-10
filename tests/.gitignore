@@ -1,0 +1,11 @@
+# Test temporary directories
+uploads/
+processed/
+db/
+logs/
+
+# Test results and coverage
+TestResults/
+*.trx
+*.coverage
+*.coveragexml

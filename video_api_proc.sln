@@ -1,8 +1,12 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "video_api_proc", "src\video_api_proc.csproj", "{64FE5496-6D0D-54F4-6A69-EBD3FBF4225A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{755D6515-3DBB-471B-802D-52974C0E5B9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoProcessingApi.IntegrationTests", "tests\VideoProcessingApi.IntegrationTests\VideoProcessingApi.IntegrationTests.csproj", "{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,11 +18,18 @@ Global
 		{64FE5496-6D0D-54F4-6A69-EBD3FBF4225A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64FE5496-6D0D-54F4-6A69-EBD3FBF4225A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64FE5496-6D0D-54F4-6A69-EBD3FBF4225A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D89CBCD0-3B07-4B13-9B60-AB8E60DCE633}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56} = {755D6515-3DBB-471B-802D-52974C0E5B9C}
 	EndGlobalSection
 EndGlobal

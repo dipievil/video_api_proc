@@ -312,6 +312,139 @@ curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
 </html>
 ```
 
+## 🧪 Integration Tests
+
+This project includes comprehensive integration tests that cover all main video processing workflows using Docker Compose to simulate a realistic end-to-end environment.
+
+### 📋 Test Prerequisites
+
+- Docker and Docker Compose installed
+- .NET 8 SDK
+- At least 4GB of available RAM
+- 2GB of free disk space
+
+### 🚀 Running Tests
+
+#### Manual execution (for development)
+```bash
+# 1. Build the test project
+dotnet build tests/VideoProcessingApi.IntegrationTests/
+
+# 2. Run all tests
+dotnet test tests/VideoProcessingApi.IntegrationTests/ --logger "console;verbosity=normal"
+
+# 3. Run specific tests
+dotnet test tests/VideoProcessingApi.IntegrationTests/ --filter "VideoMergeTests"
+```
+
+### 🎯 Test Coverage
+
+Integration tests cover:
+
+#### ✅ Processing Operations
+- **Video Merge**: Combining multiple MP4 files
+- **Format Conversion**: MP4 → AVI, different qualities
+- **Compression**: Bitrate reduction and size optimization
+- **Video Trimming**: Extracting specific time ranges
+- **Audio Extraction**: MP3, WAV, AAC output
+
+#### ✅ Job Management
+- Job creation for processing
+- Real-time status monitoring
+- Downloading processed results
+- Canceling pending jobs
+
+#### ✅ Error Scenarios
+- Non-existent jobs
+- Downloads from incomplete jobs
+- Parameter validation
+
+### 🔧 Test Configuration
+
+Tests use an isolated Docker environment with:
+- **API on port 5002** (to avoid conflicts)
+- **MinIO on ports 9002/9003** (test storage)
+- **Test API Key**: `test-api-key-12345`
+- **Isolated data** in `./tests/` (auto-cleanup)
+
+### 📁 Test Structure
+
+```
+tests/
+├── VideoProcessingApi.IntegrationTests/
+│   ├── Infrastructure/
+│   │   ├── DockerComposeFixture.cs      # Docker management
+│   │   ├── ApiTestClient.cs             # HTTP client for tests
+│   │   └── IntegrationTestBase.cs       # Base test class
+│   └── Tests/
+│       ├── VideoMergeTests.cs           # Merge tests
+│       ├── VideoConvertTests.cs         # Conversion tests
+│       ├── VideoCompressTests.cs        # Compression tests
+│       ├── VideoTrimTests.cs            # Trimming tests
+│       ├── AudioExtractionTests.cs      # Audio extraction tests
+│       └── JobDownloadTests.cs          # Download tests
+└── videos/
+    └── test_video.mp4                   # Test video file
+```
+
+### 🚨 Test Troubleshooting
+
+**❌ Error: Docker not found**
+```bash
+# Install Docker on Ubuntu/Debian
+sudo apt update && sudo apt install docker.io docker-compose
+sudo usermod -aG docker $USER
+# Logout and login again
+```
+
+**❌ Error: Permission denied on Docker**
+```bash
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+# Restart terminal
+```
+
+**❌ Tests failing due to timeout**
+- Increase Docker resources (4GB+ RAM)
+- Check that no other containers are consuming resources
+- Wait for initial Docker image downloads
+
+**❌ Port 5002 in use**
+```bash
+# Check process using the port
+sudo lsof -i :5002
+# Stop old containers
+docker-compose -f docker-compose.test.yml down --volumes
+```
+
+### 📊 Test Output Example
+
+```
+🎬 Video Processing API - Integration Tests
+=============================================
+✅ Prerequisites check passed
+🧹 Cleaning up existing test environment...
+🔧 Building test project...
+🧪 Running all integration tests...
+
+Test run for VideoProcessingApi.IntegrationTests.dll (.NETCoreApp,Version=v8.0)
+Starting test execution, please wait...
+
+[xUnit.net 00:00:00.00] Starting: VideoProcessingApi.IntegrationTests
+[xUnit.net 00:00:05.23] VideoProcessingApi.IntegrationTests.Tests.VideoMergeTests.CreateMergeJob_WithMultipleVideos_ShouldReturnSuccess [PASS]
+[xUnit.net 00:00:08.45] VideoProcessingApi.IntegrationTests.Tests.VideoConvertTests.CreateConvertJob_WithOutputFormat_ShouldReturnSuccess [PASS]
+...
+
+Test Run Successful.
+Total tests: 15
+     Passed: 15
+     Failed: 0
+     Skipped: 0
+     Total time: 2.5 Minutes
+
+✅ All integration tests passed!
+```
+
 ## 🔒 Segurança
 
 - Use HTTPS em produção
