@@ -9,6 +9,8 @@ using Serilog;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using Minio;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +28,28 @@ builder.Host.UseSerilog();
 builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("Api"));
 builder.Services.Configure<FFmpegSettings>(builder.Configuration.GetSection("FFmpeg"));
 builder.Services.Configure<SecuritySettings>(builder.Configuration.GetSection("Security"));
+builder.Services.Configure<StorageSettings>(builder.Configuration.GetSection("Storage"));
+
+// Storage Services
+var storageSettings = builder.Configuration.GetSection("Storage").Get<StorageSettings>() ?? new StorageSettings();
+
+if (storageSettings.Provider.Equals("MinIO", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddSingleton<IMinioClient>(provider =>
+    {
+        var settings = provider.GetRequiredService<IOptions<StorageSettings>>().Value.MinIO;
+        return new MinioClient()
+            .WithEndpoint(settings.Endpoint)
+            .WithCredentials(settings.AccessKey, settings.SecretKey)
+            .WithSSL(settings.UseSSL)
+            .Build();
+    });
+    builder.Services.AddScoped<IStorageService, MinIOStorageService>();
+}
+else
+{
+    builder.Services.AddScoped<IStorageService, FileSystemStorageService>();
+}
 
 // Entity Framework
 builder.Services.AddDbContext<JobDbContext>(options =>
