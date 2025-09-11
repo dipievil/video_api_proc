@@ -8,6 +8,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{755D6515
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoProcessingApi.IntegrationTests", "tests\VideoProcessingApi.IntegrationTests\VideoProcessingApi.IntegrationTests.csproj", "{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoProcessingApi.UnitTests", "tests\VideoProcessingApi.UnitTests\VideoProcessingApi.UnitTests.csproj", "{9C11D9AC-67E0-4A62-8DA5-17483AA63B5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +24,10 @@ Global
 		{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C11D9AC-67E0-4A62-8DA5-17483AA63B5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C11D9AC-67E0-4A62-8DA5-17483AA63B5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C11D9AC-67E0-4A62-8DA5-17483AA63B5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C11D9AC-67E0-4A62-8DA5-17483AA63B5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -31,5 +37,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{39A22CD8-C0DB-4CE5-B64A-CFCB13EB1C56} = {755D6515-3DBB-471B-802D-52974C0E5B9C}
+		{9C11D9AC-67E0-4A62-8DA5-17483AA63B5D} = {755D6515-3DBB-471B-802D-52974C0E5B9C}
 	EndGlobalSection
 EndGlobal
