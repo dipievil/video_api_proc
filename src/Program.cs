@@ -58,6 +58,7 @@ builder.Services.AddDbContext<JobDbContext>(options =>
 // Serviços
 builder.Services.AddScoped<IJobService, JobService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IFFmpegErrorHandlerService, FFmpegErrorHandlerService>();
 builder.Services.AddScoped<IFFmpegService, FFmpegService>();
 builder.Services.AddScoped<IEnvironmentValidationService, EnvironmentValidationService>();
 builder.Services.AddScoped<FFmpegHealthCheck>();
@@ -125,6 +126,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<JobDbContext>()
     .AddCheck<FFmpegHealthCheck>("ffmpeg");
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(80);
+});
 
 var app = builder.Build();
 

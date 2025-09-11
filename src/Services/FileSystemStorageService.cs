@@ -32,7 +32,8 @@ public class FileSystemStorageService : IStorageService
         await file.CopyToAsync(stream);
 
         _logger.LogInformation("File saved to filesystem: {FilePath}", filePath);
-        return GetRelativePath(filePath);
+    // Return absolute path so downstream consumers (eg. FFmpeg) can access the file
+    return Path.GetFullPath(filePath);
     }
 
     public async Task<string> SaveFileAsync(Stream fileStream, string fileName, string directory)
@@ -50,7 +51,8 @@ public class FileSystemStorageService : IStorageService
         await fileStream.CopyToAsync(fileStreamOut);
 
         _logger.LogInformation("File saved to filesystem: {FilePath}", filePath);
-        return GetRelativePath(filePath);
+    // Return absolute path so downstream consumers (eg. FFmpeg) can access the file
+    return Path.GetFullPath(filePath);
     }
 
     public async Task<bool> DeleteFileAsync(string filePath)

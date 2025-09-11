@@ -4,6 +4,7 @@ using System.Text;
 using VideoProcessingApi.Configuration;
 using VideoProcessingApi.DTOs;
 using VideoProcessingApi.Interfaces;
+using VideoProcessingApi.Services;
 
 namespace VideoProcessingApi.Services;
 
@@ -11,11 +12,13 @@ public class FFmpegService : IFFmpegService
 {
     private readonly FFmpegSettings _settings;
     private readonly ILogger<FFmpegService> _logger;
+    private readonly IFFmpegErrorHandlerService _errorHandler;
 
-    public FFmpegService(IOptions<FFmpegSettings> settings, ILogger<FFmpegService> logger)
+    public FFmpegService(IOptions<FFmpegSettings> settings, ILogger<FFmpegService> logger, IFFmpegErrorHandlerService errorHandler)
     {
         _settings = settings.Value;
         _logger = logger;
+        _errorHandler = errorHandler;
     }
 
     public async Task<string> MergeVideosAsync(List<string> inputPaths, string outputPath, ProcessingOptions? options = null)
@@ -98,7 +101,8 @@ public class FFmpegService : IFFmpegService
         process.StartInfo = new ProcessStartInfo
         {
             FileName = _settings.BinaryPath,
-            Arguments = arguments,
+            // reduce verbosity for easier parsing
+            Arguments = $"-hide_banner {arguments}",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
@@ -131,6 +135,13 @@ public class FFmpegService : IFFmpegService
         if (process.ExitCode != 0)
         {
             _logger.LogError("FFmpeg execution failed with exit code {ExitCode}. Error: {Error}", process.ExitCode, error);
+            // try map to friendly message
+            var friendly = _errorHandler.MapError(error);
+            if (!string.IsNullOrEmpty(friendly))
+            {
+                throw new InvalidOperationException(friendly);
+            }
+
             throw new InvalidOperationException($"FFmpeg execution failed: {error}");
         }
 
