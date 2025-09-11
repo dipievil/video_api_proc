@@ -20,6 +20,6 @@ Always analyze the code and suggest improvements based on best practices, securi
 Use the same style as the project, which is C# and .NET 9.
 
 # files
-
 Suggest changes to the `docs/` folder when appropriate in markdown format.
 If needed, create scripts on the `scripts/` folder.
+All documentation in the `docs/` folder must be in english. Additional documentation in portuguese can be added in the `docs/pt-br/` folder.
