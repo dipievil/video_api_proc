@@ -181,6 +181,32 @@ By default, the application runs only on HTTP. To enable HTTPS:
 > dotnet dev-certs https --export-path certificate.pfx --password YourPassword
 > ```
 
+### ⚙️ Configuration Files
+
+The application offers different configurations for different environments:
+
+| File | When to Use | Features |
+|------|-------------|----------|
+| `appsettings.json` | 🎯 **Local Development** | User-friendly with comments |
+| `appsettings.docker.json` | 🐳 **Docker/Containers** | Absolute paths, low security |
+| `appsettings.Production.json` | 🚀 **Production** | HTTPS, high security |
+
+#### How to Choose Configuration
+
+```bash
+# Local development (default)
+dotnet run
+
+# Docker/Containers
+ASPNETCORE_ENVIRONMENT=docker docker-compose up
+
+# Production
+ASPNETCORE_ENVIRONMENT=Production dotnet run
+```
+
+> 📖 **For more details**, see the [complete configuration documentation](docs/configuration.md)
+
+
 ### Environment Variables
 
 Edit the `.env` file to customize:
