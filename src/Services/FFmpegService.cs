@@ -37,9 +37,27 @@ public class FFmpegService : IFFmpegService
     {
         var arguments = $"-i \"{inputPath}\"";
 
+        // Build video filters (scale, crop, etc.)
+        var vfParts = new List<string>();
+
         if (!string.IsNullOrEmpty(options.Resolution))
         {
-            arguments += $" -vf scale={options.Resolution}";
+            vfParts.Add($"scale={options.Resolution}");
+        }
+
+        // If crop params are present, add crop filter
+        if (options.CropWidth.HasValue && options.CropHeight.HasValue)
+        {
+            // default x/y to 0 when not provided
+            var x = options.CropX ?? 0;
+            var y = options.CropY ?? 0;
+            vfParts.Add($"crop={options.CropWidth}:{options.CropHeight}:{x}:{y}");
+        }
+
+        if (vfParts.Any())
+        {
+            var vf = string.Join(",", vfParts);
+            arguments += $" -vf \"{vf}\"";
         }
 
         if (options.BitrateKbps.HasValue)
@@ -55,12 +73,33 @@ public class FFmpegService : IFFmpegService
     public async Task<string> CompressVideoAsync(string inputPath, string outputPath, ProcessingOptions options)
     {
         var arguments = $"-i \"{inputPath}\"";
-        
+
+        // Build video filters (crop supported for compression flow too)
+        var vfParts = new List<string>();
+
+        if (options.CropWidth.HasValue && options.CropHeight.HasValue)
+        {
+            var x = options.CropX ?? 0;
+            var y = options.CropY ?? 0;
+            vfParts.Add($"crop={options.CropWidth}:{options.CropHeight}:{x}:{y}");
+        }
+
+        if (!string.IsNullOrEmpty(options.Resolution))
+        {
+            vfParts.Add($"scale={options.Resolution}");
+        }
+
+        if (vfParts.Any())
+        {
+            var vf = string.Join(",", vfParts);
+            arguments += $" -vf \"{vf}\"";
+        }
+
         if (options.BitrateKbps.HasValue)
         {
             arguments += $" -b:v {options.BitrateKbps}k";
         }
-        
+
         arguments += $" -c:v libx264 -preset {options.Quality ?? _settings.DefaultQuality} \"{outputPath}\"";
         
         return await ExecuteFFmpegAsync(arguments);
