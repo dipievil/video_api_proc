@@ -4,6 +4,7 @@ using System.Text;
 using VideoProcessingApi.Configuration;
 using VideoProcessingApi.DTOs;
 using VideoProcessingApi.Interfaces;
+using VideoProcessingApi.Services;
 
 namespace VideoProcessingApi.Services;
 
@@ -11,11 +12,13 @@ public class FFmpegService : IFFmpegService
 {
     private readonly FFmpegSettings _settings;
     private readonly ILogger<FFmpegService> _logger;
+    private readonly IFFmpegErrorHandlerService _errorHandler;
 
-    public FFmpegService(IOptions<FFmpegSettings> settings, ILogger<FFmpegService> logger)
+    public FFmpegService(IOptions<FFmpegSettings> settings, ILogger<FFmpegService> logger, IFFmpegErrorHandlerService errorHandler)
     {
         _settings = settings.Value;
         _logger = logger;
+        _errorHandler = errorHandler;
     }
 
     public async Task<string> MergeVideosAsync(List<string> inputPaths, string outputPath, ProcessingOptions? options = null)
@@ -34,9 +37,27 @@ public class FFmpegService : IFFmpegService
     {
         var arguments = $"-i \"{inputPath}\"";
 
+        // Build video filters (scale, crop, etc.)
+        var vfParts = new List<string>();
+
         if (!string.IsNullOrEmpty(options.Resolution))
         {
-            arguments += $" -vf scale={options.Resolution}";
+            vfParts.Add($"scale={options.Resolution}");
+        }
+
+        // If crop params are present, add crop filter
+        if (options.CropWidth.HasValue && options.CropHeight.HasValue)
+        {
+            // default x/y to 0 when not provided
+            var x = options.CropX ?? 0;
+            var y = options.CropY ?? 0;
+            vfParts.Add($"crop={options.CropWidth}:{options.CropHeight}:{x}:{y}");
+        }
+
+        if (vfParts.Any())
+        {
+            var vf = string.Join(",", vfParts);
+            arguments += $" -vf \"{vf}\"";
         }
 
         if (options.BitrateKbps.HasValue)
@@ -52,12 +73,33 @@ public class FFmpegService : IFFmpegService
     public async Task<string> CompressVideoAsync(string inputPath, string outputPath, ProcessingOptions options)
     {
         var arguments = $"-i \"{inputPath}\"";
-        
+
+        // Build video filters (crop supported for compression flow too)
+        var vfParts = new List<string>();
+
+        if (options.CropWidth.HasValue && options.CropHeight.HasValue)
+        {
+            var x = options.CropX ?? 0;
+            var y = options.CropY ?? 0;
+            vfParts.Add($"crop={options.CropWidth}:{options.CropHeight}:{x}:{y}");
+        }
+
+        if (!string.IsNullOrEmpty(options.Resolution))
+        {
+            vfParts.Add($"scale={options.Resolution}");
+        }
+
+        if (vfParts.Any())
+        {
+            var vf = string.Join(",", vfParts);
+            arguments += $" -vf \"{vf}\"";
+        }
+
         if (options.BitrateKbps.HasValue)
         {
             arguments += $" -b:v {options.BitrateKbps}k";
         }
-        
+
         arguments += $" -c:v libx264 -preset {options.Quality ?? _settings.DefaultQuality} \"{outputPath}\"";
         
         return await ExecuteFFmpegAsync(arguments);
@@ -98,7 +140,8 @@ public class FFmpegService : IFFmpegService
         process.StartInfo = new ProcessStartInfo
         {
             FileName = _settings.BinaryPath,
-            Arguments = arguments,
+            // reduce verbosity for easier parsing
+            Arguments = $"-hide_banner {arguments}",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
@@ -131,6 +174,13 @@ public class FFmpegService : IFFmpegService
         if (process.ExitCode != 0)
         {
             _logger.LogError("FFmpeg execution failed with exit code {ExitCode}. Error: {Error}", process.ExitCode, error);
+            // try map to friendly message
+            var friendly = _errorHandler.MapError(error);
+            if (!string.IsNullOrEmpty(friendly))
+            {
+                throw new InvalidOperationException(friendly);
+            }
+
             throw new InvalidOperationException($"FFmpeg execution failed: {error}");
         }
 
