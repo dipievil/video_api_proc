@@ -1,62 +1,62 @@
 # 🎬 Video Processing API
 
-Uma API simples e poderosa para processamento de vídeos usando FFmpeg. Faça merge, conversão, compressão e corte de vídeos de forma assíncrona.
+A simple and powerful API for video processing using FFmpeg. Perform merge, conversion, compression, and trimming operations asynchronously.
 
-> 🇺🇸 **[English version available here](README.en.md)**
+> 🇧🇷 **[Versão em português disponível aqui](README.md)**
 
-## ✨ Funcionalidades
+## ✨ Features
 
-- **📁 Upload de Múltiplos Vídeos**: Envie vários arquivos de uma vez
-- **🔄 Processamento Assíncrono**: Acompanhe o progresso em tempo real
-- **🎥 Merge de Vídeos**: Junte vários vídeos em um só
-- **🔄 Conversão de Formato**: Converta entre MP4, AVI, MOV, MKV
-- **📉 Compressão**: Reduza o tamanho dos vídeos
-- **✂️ Corte de Vídeo**: Extraia trechos específicos
-- **🎵 Extração de Áudio**: Extraia áudio dos vídeos
+- **📁 Multiple Video Upload**: Upload multiple files at once
+- **🔄 Asynchronous Processing**: Track progress in real-time
+- **🎥 Video Merging**: Combine multiple videos into one
+- **🔄 Format Conversion**: Convert between MP4, AVI, MOV, MKV
+- **📉 Compression**: Reduce video file sizes
+- **✂️ Video Trimming**: Extract specific segments
+- **🎵 Audio Extraction**: Extract audio from videos
 
-## 🚀 Início Rápido
+## 🚀 Quick Start
 
-### Pré-requisitos
+### Prerequisites
 
-- Docker e Docker Compose instalados
-- Pelo menos 2GB de RAM disponível
-- Espaço em disco para os vídeos
+- Docker and Docker Compose installed
+- At least 2GB of available RAM
+- Disk space for video files
 
-### Instalação
+### Installation
 
-1. **Baixe o projeto**:
+1. **Download the project**:
    ```bash
-   git clone https://github.com/seu-usuario/video_api_proc.git
+   git clone https://github.com/your-username/video_api_proc.git
    cd video_api_proc
    ```
 
-2. **Configure as variáveis (opcional)**:
+2. **Configure variables (optional)**:
    ```bash
    cp .env.example .env
-   # Edite o arquivo .env se necessário
+   # Edit the .env file if needed
    ```
 
-3. **Inicie a aplicação**:
+3. **Start the application**:
    ```bash
    docker-compose up -d
    ```
 
-4. **Acesse a API**:
-   - API: http://localhost:5000 (HTTP por padrão)
-   - Documentação: http://localhost:5000/swagger
-   - Para HTTPS: https://localhost:5001 (se habilitado)
+4. **Access the API**:
+   - API: http://localhost:5000 (HTTP by default)
+   - Documentation: http://localhost:5000/swagger
+   - For HTTPS: https://localhost:5001 (if enabled)
 
-## 📖 Como Usar
+## 📖 How to Use
 
-### 1. Obter uma API Key
+### 1. Get an API Key
 
-Por padrão, use uma das chaves configuradas:
-- `dev-key-12345` (desenvolvimento)
-- `prod-key-67890` (produção)
+By default, use one of the configured keys:
+- `dev-key-12345` (development)
+- `prod-key-67890` (production)
 
-### 2. Fazer Upload e Processar Vídeos
+### 2. Upload and Process Videos
 
-#### Merge de Vídeos
+#### Video Merging
 ```bash
 curl -X POST "http://localhost:5000/api/jobs" \
   -H "X-API-Key: dev-key-12345" \
@@ -65,7 +65,7 @@ curl -X POST "http://localhost:5000/api/jobs" \
   -F "files=@video2.mp4"
 ```
 
-#### Conversão de Formato
+#### Format Conversion
 ```bash
 curl -X POST "http://localhost:5000/api/jobs" \
   -H "X-API-Key: dev-key-12345" \
@@ -74,7 +74,7 @@ curl -X POST "http://localhost:5000/api/jobs" \
   -F "options={\"outputFormat\":\"mp4\",\"quality\":\"medium\"}"
 ```
 
-#### Compressão
+#### Compression
 ```bash
 curl -X POST "http://localhost:5000/api/jobs" \
   -H "X-API-Key: dev-key-12345" \
@@ -83,36 +83,36 @@ curl -X POST "http://localhost:5000/api/jobs" \
   -F "options={\"quality\":\"low\",\"bitrateKbps\":1000}"
 ```
 
-### 3. Consultar Status do Job
+### 3. Check Job Status
 
 ```bash
 curl -X GET "http://localhost:5000/api/jobs/{job-id}/status" \
   -H "X-API-Key: dev-key-12345"
 ```
 
-### 4. Baixar o Resultado
+### 4. Download the Result
 
-Quando o status for `Completed`, use o link fornecido na resposta:
+When the status is `Completed`, use the link provided in the response:
 
 ```bash
 curl -X GET "http://localhost:5000/api/jobs/{job-id}/download" \
   -H "X-API-Key: dev-key-12345" \
-  -o video_processado.mp4
+  -o processed_video.mp4
 ```
 
-## 🎛️ Opções de Processamento
+## 🎛️ Processing Options
 
-### Qualidades Disponíveis
-- `low` - Processamento rápido, qualidade básica
-- `medium` - Balanceado (padrão)
-- `high` - Alta qualidade, mais lento
-- `ultra` - Máxima qualidade
+### Available Qualities
+- `low` - Fast processing, basic quality
+- `medium` - Balanced (default)
+- `high` - High quality, slower
+- `ultra` - Maximum quality
 
-### Formatos Suportados
-- **Entrada**: MP4, AVI, MOV, MKV, WMV, FLV
-- **Saída**: MP4 (padrão), AVI, MOV, MKV
+### Supported Formats
+- **Input**: MP4, AVI, MOV, MKV, WMV, FLV
+- **Output**: MP4 (default), AVI, MOV, MKV
 
-### Opções de Corte
+### Trimming Options
 ```json
 {
   "startTime": 10.5,
@@ -120,28 +120,28 @@ curl -X GET "http://localhost:5000/api/jobs/{job-id}/download" \
 }
 ```
 
-### Opções de Resolução
+### Resolution Options
 ```json
 {
   "resolution": "1920x1080"
 }
 ```
 
-## 📊 Status dos Jobs
+## 📊 Job Status
 
-- `Pending` - Na fila para processamento
-- `Processing` - Sendo processado
-- `Completed` - Finalizado com sucesso
-- `Failed` - Erro no processamento
-- `Canceled` - Cancelado pelo usuário
+- `Pending` - Queued for processing
+- `Processing` - Being processed
+- `Completed` - Successfully finished
+- `Failed` - Processing error
+- `Canceled` - Canceled by user
 
-## 🛠️ Configuração Avançada
+## 🛠️ Advanced Configuration
 
-### Configuração HTTPS
+### HTTPS Configuration
 
-Por padrão, a aplicação roda apenas em HTTP. Para habilitar HTTPS:
+By default, the application runs only on HTTP. To enable HTTPS:
 
-**Desenvolvimento (appsettings.Development.json):**
+**Development (appsettings.Development.json):**
 ```json
 {
   "UseHttpsRedirection": false,
@@ -155,7 +155,7 @@ Por padrão, a aplicação roda apenas em HTTP. Para habilitar HTTPS:
 }
 ```
 
-**Produção (appsettings.Production.json):**
+**Production (appsettings.Production.json):**
 ```json
 {
   "UseHttpsRedirection": true,
@@ -176,22 +176,22 @@ Por padrão, a aplicação roda apenas em HTTP. Para habilitar HTTPS:
 }
 ```
 
-> **💡 Dica**: Para gerar um certificado de desenvolvimento, use:
+> **💡 Tip**: To generate a development certificate, use:
 > ```bash
 > dotnet dev-certs https --export-path certificate.pfx --password YourPassword
 > ```
 
-### Variáveis de Ambiente
+### Environment Variables
 
-Edite o arquivo `.env` para personalizar:
+Edit the `.env` file to customize:
 
 ```env
-# Limites de arquivo
+# File limits
 API_MAX_FILE_SIZE_MB=500
 API_MAX_CONCURRENT_JOBS=3
 
-# Segurança
-API_KEYS=sua-chave-aqui,outra-chave
+# Security
+API_KEYS=your-key-here,another-key
 RATE_LIMIT_MAX_REQUESTS_PER_MINUTE=30
 
 # FFmpeg
@@ -200,46 +200,46 @@ FFMPEG_TIMEOUT_MINUTES=30
 
 ### Logs
 
-Os logs ficam disponíveis em:
+Logs are available at:
 - Container: `docker-compose logs video-processing-api`
-- Arquivo: `./logs/api-*.txt`
+- File: `./logs/api-*.txt`
 
 ## 🔧 Troubleshooting
 
-### Problemas Comuns
+### Common Issues
 
-**❌ Erro 429 - Too Many Requests**
-- Aguarde um momento antes de fazer nova requisição
-- Verifique o rate limiting configurado
+**❌ Error 429 - Too Many Requests**
+- Wait a moment before making a new request
+- Check the configured rate limiting
 
-**❌ Erro 413 - File Too Large**
-- Reduza o tamanho do arquivo
-- Ajuste `API_MAX_FILE_SIZE_MB` no `.env`
+**❌ Error 413 - File Too Large**
+- Reduce the file size
+- Adjust `API_MAX_FILE_SIZE_MB` in `.env`
 
-**❌ Job com status "Failed"**
-- Verifique os logs: `docker-compose logs video-processing-api`
-- Confirme se o arquivo de vídeo não está corrompido
+**❌ Job with "Failed" status**
+- Check logs: `docker-compose logs video-processing-api`
+- Confirm the video file is not corrupted
 
-**❌ FFmpeg não encontrado**
-- Reinicie os containers: `docker-compose restart`
-- Verifique se a imagem foi construída corretamente
+**❌ FFmpeg not found**
+- Restart containers: `docker-compose restart`
+- Check if the image was built correctly
 
-### Verificar Saúde da API
+### Check API Health
 
 ```bash
 curl http://localhost:5000/health
 ```
 
-### Cancelar um Job
+### Cancel a Job
 
 ```bash
 curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
   -H "X-API-Key: dev-key-12345"
 ```
 
-## 📝 Exemplos Práticos
+## 📝 Practical Examples
 
-### Interface Web Simples (HTML + JavaScript)
+### Simple Web Interface (HTML + JavaScript)
 
 ```html
 <!DOCTYPE html>
@@ -248,16 +248,16 @@ curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
     <title>Video Processor</title>
 </head>
 <body>
-    <h1>Processador de Vídeo</h1>
+    <h1>Video Processor</h1>
     
     <form id="uploadForm">
         <input type="file" id="videoFiles" multiple accept="video/*">
         <select id="processingType">
-            <option value="Merge">Juntar Vídeos</option>
-            <option value="Convert">Converter</option>
-            <option value="Compress">Comprimir</option>
+            <option value="Merge">Merge Videos</option>
+            <option value="Convert">Convert</option>
+            <option value="Compress">Compress</option>
         </select>
-        <button type="submit">Processar</button>
+        <button type="submit">Process</button>
     </form>
     
     <div id="status"></div>
@@ -288,7 +288,7 @@ curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
                 const result = await response.json();
                 checkStatus(result.jobId);
             } catch (error) {
-                document.getElementById('status').innerHTML = `Erro: ${error.message}`;
+                document.getElementById('status').innerHTML = `Error: ${error.message}`;
             }
         };
         
@@ -304,7 +304,7 @@ curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
                 setTimeout(() => checkStatus(jobId), 2000);
             } else if (status.status === 'Completed') {
                 document.getElementById('status').innerHTML += 
-                    `<br><a href="${API_URL}/jobs/${jobId}/download" download>Baixar Resultado</a>`;
+                    `<br><a href="${API_URL}/jobs/${jobId}/download" download>Download Result</a>`;
             }
         }
     </script>
@@ -312,156 +312,23 @@ curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
 </html>
 ```
 
-## 🧪 Integration Tests
+## 🔒 Security
 
-This project includes comprehensive integration tests that cover all main video processing workflows using Docker Compose to simulate a realistic end-to-end environment.
+- Use HTTPS in production
+- Keep API Keys secure
+- Configure appropriate rate limiting
+- Monitor logs regularly
 
-### 📋 Test Prerequisites
-
-- Docker and Docker Compose installed
-- .NET 8 SDK
-- At least 4GB of available RAM
-- 2GB of free disk space
-
-### 🚀 Running Tests
-
-#### Manual execution (for development)
-```bash
-# 1. Build the test project
-dotnet build tests/VideoProcessingApi.IntegrationTests/
-
-# 2. Run all tests
-dotnet test tests/VideoProcessingApi.IntegrationTests/ --logger "console;verbosity=normal"
-
-# 3. Run specific tests
-dotnet test tests/VideoProcessingApi.IntegrationTests/ --filter "VideoMergeTests"
-```
-
-### 🎯 Test Coverage
-
-Integration tests cover:
-
-#### ✅ Processing Operations
-- **Video Merge**: Combining multiple MP4 files
-- **Format Conversion**: MP4 → AVI, different qualities
-- **Compression**: Bitrate reduction and size optimization
-- **Video Trimming**: Extracting specific time ranges
-- **Audio Extraction**: MP3, WAV, AAC output
-
-#### ✅ Job Management
-- Job creation for processing
-- Real-time status monitoring
-- Downloading processed results
-- Canceling pending jobs
-
-#### ✅ Error Scenarios
-- Non-existent jobs
-- Downloads from incomplete jobs
-- Parameter validation
-
-### 🔧 Test Configuration
-
-Tests use an isolated Docker environment with:
-- **API on port 5002** (to avoid conflicts)
-- **MinIO on ports 9002/9003** (test storage)
-- **Test API Key**: `test-api-key-12345`
-- **Isolated data** in `./tests/` (auto-cleanup)
-
-### 📁 Test Structure
-
-```
-tests/
-├── VideoProcessingApi.IntegrationTests/
-│   ├── Infrastructure/
-│   │   ├── DockerComposeFixture.cs      # Docker management
-│   │   ├── ApiTestClient.cs             # HTTP client for tests
-│   │   └── IntegrationTestBase.cs       # Base test class
-│   └── Tests/
-│       ├── VideoMergeTests.cs           # Merge tests
-│       ├── VideoConvertTests.cs         # Conversion tests
-│       ├── VideoCompressTests.cs        # Compression tests
-│       ├── VideoTrimTests.cs            # Trimming tests
-│       ├── AudioExtractionTests.cs      # Audio extraction tests
-│       └── JobDownloadTests.cs          # Download tests
-└── videos/
-    └── test_video.mp4                   # Test video file
-```
-
-### 🚨 Test Troubleshooting
-
-**❌ Error: Docker not found**
-```bash
-# Install Docker on Ubuntu/Debian
-sudo apt update && sudo apt install docker.io docker-compose
-sudo usermod -aG docker $USER
-# Logout and login again
-```
-
-**❌ Error: Permission denied on Docker**
-```bash
-sudo systemctl start docker
-sudo usermod -aG docker $USER
-# Restart terminal
-```
-
-**❌ Tests failing due to timeout**
-- Increase Docker resources (4GB+ RAM)
-- Check that no other containers are consuming resources
-- Wait for initial Docker image downloads
-
-**❌ Port 5002 in use**
-```bash
-# Check process using the port
-sudo lsof -i :5002
-# Stop old containers
-docker-compose -f docker-compose.test.yml down --volumes
-```
-
-### 📊 Test Output Example
-
-```
-🎬 Video Processing API - Integration Tests
-=============================================
-✅ Prerequisites check passed
-🧹 Cleaning up existing test environment...
-🔧 Building test project...
-🧪 Running all integration tests...
-
-Test run for VideoProcessingApi.IntegrationTests.dll (.NETCoreApp,Version=v8.0)
-Starting test execution, please wait...
-
-[xUnit.net 00:00:00.00] Starting: VideoProcessingApi.IntegrationTests
-[xUnit.net 00:00:05.23] VideoProcessingApi.IntegrationTests.Tests.VideoMergeTests.CreateMergeJob_WithMultipleVideos_ShouldReturnSuccess [PASS]
-[xUnit.net 00:00:08.45] VideoProcessingApi.IntegrationTests.Tests.VideoConvertTests.CreateConvertJob_WithOutputFormat_ShouldReturnSuccess [PASS]
-...
-
-Test Run Successful.
-Total tests: 15
-     Passed: 15
-     Failed: 0
-     Skipped: 0
-     Total time: 2.5 Minutes
-
-✅ All integration tests passed!
-```
-
-## 🔒 Segurança
-
-- Use HTTPS em produção
-- Mantenha as API Keys seguras
-- Configure rate limiting adequado
-- Monitore os logs regularmente
-
-## 📞 Suporte
+## 📞 Support
 
 - **Logs**: `docker-compose logs -f video-processing-api`
 - **Health Check**: `http://localhost:5000/health`
-- **Documentação**: `http://localhost:5000/swagger`
+- **Documentation**: `http://localhost:5000/swagger`
 
-## 📄 Licença
+## 📄 License
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+This project is under the MIT license. See the [LICENSE](LICENSE) file for more details.
 
 ---
 
-**🎬 Desenvolvido com ❤️ para facilitar o processamento de vídeos**
+**🎬 Developed with ❤️ to make video processing easier**
