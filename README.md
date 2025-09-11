@@ -345,6 +345,59 @@ curl -X DELETE "http://localhost:5000/api/jobs/{job-id}" \
 - Configure appropriate rate limiting
 - Monitor logs regularly
 
+## 🧪 Development & Testing
+
+### Running Tests
+
+The project includes both unit tests and integration tests:
+
+**Unit Tests:**
+```bash
+# Run all unit tests
+dotnet test tests/VideoProcessingApi.UnitTests
+
+# Run with detailed output
+dotnet test tests/VideoProcessingApi.UnitTests --verbosity normal
+```
+
+**Integration Tests:**
+```bash
+# Run all integration tests
+dotnet test tests/VideoProcessingApi.IntegrationTests
+
+# Run specific test category
+dotnet test --filter "Category=VideoMerge"
+```
+
+**All Tests:**
+```bash
+# Run entire test suite
+dotnet test
+```
+
+### Test Coverage
+
+- **FileService**: File validation, storage operations
+- **JobService**: Job management, status tracking
+- **FFmpegErrorHandler**: Error message mapping
+- **EnvironmentValidation**: System health checks
+- **API Endpoints**: Full integration testing
+
+### Development Setup
+
+```bash
+# Clone and setup
+git clone <repository>
+cd video_api_proc
+dotnet restore
+
+# Run development server
+dotnet run --project src/
+
+# Watch for changes
+dotnet watch --project src/
+```
+
 ## 📞 Support
 
 - **Logs**: `docker-compose logs -f video-processing-api`

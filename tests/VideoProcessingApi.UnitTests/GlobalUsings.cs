@@ -1,0 +1,10 @@
+global using Xunit;
+global using Moq;
+global using FluentAssertions;
+global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Options;
+global using VideoProcessingApi.Services;
+global using VideoProcessingApi.Interfaces;
+global using VideoProcessingApi.DTOs;
+global using VideoProcessingApi.Configuration;
+global using VideoProcessingApi.Enums;
