@@ -1,5 +1,5 @@
 services:
-  video-processing-api:
+  viproc-api:
     container_name: viprocAPI
     build:
       context: .
@@ -20,7 +20,7 @@ services:
       - Logging__LogLevel__Default=Information
       - RateLimit__MaxRequestsPerMinute=30
     depends_on:
-      - ffmpeg-service
+      - viproc_ffmpeg
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
@@ -28,31 +28,13 @@ services:
       timeout: 10s
       retries: 3
 
-  ffmpeg-service:
+  viproc_ffmpeg:
     image: jrottenberg/ffmpeg:4.4-alpine
     container_name: viprocAPI_ffmpeg
     command: ["sleep", "infinity"]
     volumes:
       - ./uploads:/uploads
       - ./processed:/processed
-
-  minio:
-    image: minio/minio:latest
-    container_name: viprocAPI_storage
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin123
-    command: server /data --console-address ":9001"
-    volumes:
-      - minio_data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
 
 volumes:
   minio_data:
