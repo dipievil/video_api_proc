@@ -1,5 +1,5 @@
 services:
-  viproc-api:
+  api:
     container_name: viprocAPI
     build:
       context: .
@@ -14,14 +14,14 @@ services:
       - ./logs:/app/logs
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_HTTP_PORTS=80
       - ConnectionStrings__APIDBConnection=Data Source=/app/db/jobs.db
       - FFmpeg__BinaryPath=/usr/bin/ffmpeg
       - Security__ApiKeys__0=your-api-key-here
       - Logging__LogLevel__Default=Information
       - RateLimit__MaxRequestsPerMinute=30
     depends_on:
-      - viproc_ffmpeg
+      - ffmpeg
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
@@ -29,7 +29,7 @@ services:
       timeout: 10s
       retries: 3
 
-  viproc_ffmpeg:
+  ffmpeg:
     image: jrottenberg/ffmpeg:4.4-alpine
     container_name: viprocAPI_ffmpeg
     command: ["sleep", "infinity"]
@@ -37,5 +37,3 @@ services:
       - ./uploads:/uploads
       - ./processed:/processed
 
-volumes:
-  minio_data:

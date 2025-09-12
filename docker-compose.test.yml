@@ -12,7 +12,7 @@ services:
       - ./tests/logs:/app/logs
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Data Source=/app/db/jobs.db
+      - ConnectionStrings__APIDBConnection=Data Source=/app/db/jobs.db
       - FFmpeg__BinaryPath=/usr/bin/ffmpeg
       - Security__ApiKeys__0=test-api-key-12345
       - Security__ApiKeys__1=dev-key-12345
