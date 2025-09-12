@@ -1,4 +1,6 @@
 using VideoProcessingApi.Interfaces;
+using VideoProcessingApi.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace VideoProcessingApi.BackgroundServices;
 
@@ -17,6 +19,9 @@ public class CleanupBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        // Wait for database to be ready
+        await WaitForDatabaseAsync(stoppingToken);
+        
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -38,5 +43,34 @@ public class CleanupBackgroundService : BackgroundService
                 await Task.Delay(TimeSpan.FromMinutes(30), stoppingToken);
             }
         }
+    }
+
+    private async Task WaitForDatabaseAsync(CancellationToken cancellationToken)
+    {
+        var maxRetries = 30; // 30 attempts, 2 seconds each = 1 minute max
+        var retryCount = 0;
+        
+        while (retryCount < maxRetries && !cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<JobDbContext>();
+                
+                // Try to query the database to check if it's ready
+                await dbContext.Jobs.AnyAsync(cancellationToken);
+                
+                _logger.LogInformation("Database is ready for cleanup service");
+                return;
+            }
+            catch (Exception ex)
+            {
+                retryCount++;
+                _logger.LogDebug(ex, "Database not ready yet (attempt {RetryCount}/{MaxRetries})", retryCount, maxRetries);
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+            }
+        }
+        
+        _logger.LogWarning("Database did not become ready within expected time, continuing anyway");
     }
 }

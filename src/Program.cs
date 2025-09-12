@@ -67,6 +67,7 @@ builder.Services.AddScoped<FFmpegHealthCheck>();
 // Background Services
 builder.Services.AddHostedService<VideoProcessingBackgroundService>();
 builder.Services.AddHostedService<CleanupBackgroundService>();
+builder.Services.AddHostedService<DatabaseInitializationService>();
 
 // Controllers e JSON
 builder.Services.AddControllers()
@@ -141,11 +142,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<JobDbContext>()
     .AddCheck<FFmpegHealthCheck>("ffmpeg");
-
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(80);
-});
 
 var app = builder.Build();
 
