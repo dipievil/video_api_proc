@@ -1,3 +1,4 @@
+
 using Microsoft.EntityFrameworkCore;
 using VideoProcessingApi.Data;
 using VideoProcessingApi.Services;
@@ -53,7 +54,7 @@ else
 
 // Entity Framework
 builder.Services.AddDbContext<JobDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("APIDBConnection")));
 
 // Serviços
 builder.Services.AddScoped<IJobService, JobService>();
