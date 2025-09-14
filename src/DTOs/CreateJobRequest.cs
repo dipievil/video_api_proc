@@ -7,7 +7,6 @@ public class CreateJobRequest
     /// <summary>
     /// Type of processing to perform on uploaded file(s). Examples: Merge, Convert, Compress, Trim, ExtractAudio.
     /// </summary>
-    /// <example>Convert</example>
     public ProcessingType ProcessingType { get; set; }
     /// <summary>
     /// Optional processing options. Provide as JSON when sending multipart/form-data.

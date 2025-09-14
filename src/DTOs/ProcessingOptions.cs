@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using VideoProcessingApi.Enums;
 
 namespace VideoProcessingApi.DTOs;
@@ -7,63 +8,54 @@ public class ProcessingOptions
     /// <summary>
     /// Desired output format (e.g. "mp4", "mov").
     /// </summary>
-    /// <example>mp4</example>
+    [JsonPropertyName("OutputFormat")]
     public string? OutputFormat { get; set; }
     /// <summary>
     /// Encoding preset or quality profile for FFmpeg (e.g. "fast", "slow").
     /// </summary>
-    /// <example>fast</example>
     public string? Quality { get; set; }
     /// <summary>
-    /// Target video bitrate in kilobits per second.
+    /// Target video bitrate in kilobits per second (e.g. 1200).
     /// </summary>
-    /// <example>1200</example>
     public int? BitrateKbps { get; set; }
     /// <summary>
     /// Target resolution as WIDTH:HEIGHT (e.g. "1280:720").
     /// </summary>
-    /// <example>1280:720</example>
     public string? Resolution { get; set; }
-    // Crop parameters: define an optional crop area.
-    // If provided, FFmpeg will run `-vf "crop=CropWidth:CropHeight:CropX:CropY"`.
     /// <summary>
-    /// Crop width in pixels. When set together with <see cref="CropHeight"/>, a crop filter will be applied.
+    /// Crop parameters: define an optional crop area.
+    /// If provided, FFmpeg will run `-vf "crop=CropWidth:CropHeight:CropX:CropY"`.
+    /// When set together with <see cref="CropHeight"/>, a crop filter will be applied (e.g. 640).
     /// </summary>
-    /// <example>640</example>
     public int? CropWidth { get; set; }
     /// <summary>
-    /// Crop height in pixels.
+    /// Crop parameters: define an optional crop area.
+    /// If provided, FFmpeg will run `-vf "crop=CropWidth:CropHeight:CropX:CropY"`.
+    /// When set together with <see cref="CropWidth"/>, a crop filter will be applied (e.g. 280).
     /// </summary>
-    /// <example>360</example>
     public int? CropHeight { get; set; }
     /// <summary>
-    /// X offset for crop (pixels). Defaults to 0 when omitted.
+    /// X offset for crop (pixels). Defaults to 0 when omitted (e.g. 10).
     /// </summary>
-    /// <example>10</example>
     public int? CropX { get; set; }
     /// <summary>
-    /// Y offset for crop (pixels). Defaults to 0 when omitted.
+    /// Y offset for crop (pixels). Defaults to 0 when omitted (e.g. 20).
     /// </summary>
-    /// <example>20</example>
     public int? CropY { get; set; }
     /// <summary>
-    /// Start time in seconds for trimming operations.
+    /// Start time in seconds for trimming operations (e.g. 5.0).
     /// </summary>
-    /// <example>5.0</example>
     public double? StartTime { get; set; }
     /// <summary>
-    /// End time in seconds for trimming operations.
+    /// End time in seconds for trimming operations (e.g. 15.0).
     /// </summary>
-    /// <example>15.0</example>
     public double? EndTime { get; set; }
     /// <summary>
-    /// Optional text watermark to render onto the video.
+    /// Optional text watermark to render onto the video (e.g. Sample watermark).
     /// </summary>
-    /// <example>Sample watermark</example>
     public string? WatermarkText { get; set; }
     /// <summary>
-    /// Optional file path to an image to be used as watermark.
+    /// Optional file path to an image to be used as watermark (e.g. /path/to/watermark.png).
     /// </summary>
-    /// <example>/path/to/watermark.png</example>
     public string? WatermarkImagePath { get; set; }
 }
