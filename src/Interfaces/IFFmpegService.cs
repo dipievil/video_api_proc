@@ -11,4 +11,5 @@ public interface IFFmpegService
     Task<string> ExtractAudioAsync(string inputPath, string outputPath, ProcessingOptions? options = null);
     Task<bool> ValidateVideoFileAsync(string filePath);
     Task<bool> IsFFmpegAvailableAsync();
+    Task<VideoInfoResponse> GetVideoInfoAsync(string filePath, string filename);
 }

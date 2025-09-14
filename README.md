@@ -8,6 +8,7 @@ A simple and powerful API for video processing using FFmpeg. Perform merge, conv
 
 - **📁 Multiple Video Upload**: Upload multiple files at once
 - **🔄 Asynchronous Processing**: Track progress in real-time
+- **📊 Video Information**: Get detailed metadata (dimensions, codecs, bitrate, etc.)
 - **🎥 Video Merging**: Combine multiple videos into one
 - **🔄 Format Conversion**: Convert between MP4, AVI, MOV, MKV
 - **📉 Compression**: Reduce video file sizes
@@ -55,6 +56,31 @@ By default, use one of the configured keys:
 - `prod-key-67890` (production)
 
 ### 2. Upload and Process Videos
+
+#### Get Video Information
+Get detailed metadata about a video file:
+```bash
+curl -X POST "http://localhost:5000/api/videos/info" \
+  -H "X-API-Key: dev-key-12345" \
+  -F "file=@video.mp4"
+```
+
+**Response:**
+```json
+{
+  "width": 1920,
+  "height": 1080,
+  "aspectRatio": "16:9",
+  "duration": 120.5,
+  "bitrate": 2500,
+  "frameRate": 30.0,
+  "codec": "h264",
+  "audioCodec": "aac",
+  "fileSize": 15728640,
+  "filename": "video.mp4",
+  "format": "mp4"
+}
+```
 
 #### Video Merging
 ```bash
