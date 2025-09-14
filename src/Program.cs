@@ -85,7 +85,7 @@ builder.Services.AddSwaggerGen(c =>
     { 
         Title = "Video Processing API", 
         Version = "v1",
-    Description = "Asynchronous video processing API using FFmpeg. Supports merge, convert, compress, trim, extract audio and watermarking."
+        Description = "Asynchronous video processing API using FFmpeg. Supports merge, convert, compress, trim, extract audio and watermarking."
     });
     
     c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
@@ -165,7 +165,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Video Processing API V1");
-        c.RoutePrefix = string.Empty;    
+        c.RoutePrefix = string.Empty;
+        c.DocumentTitle = "Video Processing API Documentation";
     });
 }
 
