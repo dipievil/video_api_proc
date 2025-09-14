@@ -18,6 +18,19 @@ public class FileService : IFileService
         return await _storageService.SaveFileAsync(file, directory);
     }
 
+    public async Task<string> SaveTempFileAsync(IFormFile file)
+    {
+        var tempDirectory = Path.GetTempPath();
+        var tempFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+        var tempFilePath = Path.Combine(tempDirectory, tempFileName);
+
+        using var stream = new FileStream(tempFilePath, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        _logger.LogInformation("Temporary file saved: {TempFilePath}", tempFilePath);
+        return tempFilePath;
+    }
+
     public async Task<bool> DeleteFileAsync(string filePath)
     {
         return await _storageService.DeleteFileAsync(filePath);

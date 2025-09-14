@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Options;
 using VideoProcessingApi.Configuration;
+using VideoProcessingApi.Interfaces;
 
 namespace VideoProcessingApi.Validators;
 
-public class FileValidator
+public class FileValidator : IFileValidator
 {
     private readonly ApiSettings _settings;
 

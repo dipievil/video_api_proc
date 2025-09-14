@@ -76,6 +76,18 @@ public class ApiTestClient : IDisposable
         return await _httpClient.GetAsync("/health");
     }
 
+    public async Task<HttpResponseMessage> GetVideoInfoAsync(byte[] videoContent, string fileName = "test_video.mp4")
+    {
+        using var form = new MultipartFormDataContent();
+        
+        // Add video file
+        var fileContent = new ByteArrayContent(videoContent);
+        fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("video/mp4");
+        form.Add(fileContent, "file", fileName);
+
+        return await _httpClient.PostAsync("/api/videos/info", form);
+    }
+
     public async Task<JobStatusResponse> WaitForJobCompletionAsync(Guid jobId, TimeSpan? timeout = null)
     {
         var maxWait = timeout ?? TimeSpan.FromMinutes(5);
