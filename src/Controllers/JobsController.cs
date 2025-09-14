@@ -32,6 +32,20 @@ public class JobsController : ControllerBase
     {
         try
         {
+            // Ensure uploaded files are available on the request DTO.
+            // Some clients may post files but model binding doesn't populate the DTO.Files property.
+            if ((request.Files == null || !request.Files.Any()) && Request?.Form?.Files != null && Request.Form.Files.Any())
+            {
+                request.Files = Request.Form.Files.ToList();
+            }
+
+            // Validate that at least one file was uploaded
+            var hasFiles = (request.Files != null && request.Files.Any());
+            if (!hasFiles)
+            {
+                return BadRequest(new { error = "Missing file" });
+            }
+
             var apiKey = HttpContext.Request.Headers["X-API-Key"].FirstOrDefault() ?? "unknown";
             var jobId = await _jobService.CreateJobAsync(request, apiKey);
             

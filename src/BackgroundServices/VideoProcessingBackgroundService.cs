@@ -116,14 +116,35 @@ public class VideoProcessingBackgroundService : BackgroundService
                     await ffmpegService.MergeVideosAsync(job.InputFilePaths, outputPath, job.Options);
                     break;
                 case ProcessingType.Convert:
-                    await ffmpegService.ConvertVideoAsync(job.InputFilePaths.First(), outputPath, job.Options!);
+                {
+                    if (!job.InputFilePaths.Any())
+                        throw new InvalidOperationException("No input files provided for Convert operation");
+
+                    var input = job.InputFilePaths.First();
+                    await ffmpegService.ConvertVideoAsync(input, outputPath, job.Options!);
                     break;
+                }
                 case ProcessingType.Compress:
-                    await ffmpegService.CompressVideoAsync(job.InputFilePaths.First(), outputPath, job.Options!);
+                {
+                    if (!job.InputFilePaths.Any())
+                        throw new InvalidOperationException("No input files provided for Compress operation");
+
+                    var input = job.InputFilePaths.First();
+                    await ffmpegService.CompressVideoAsync(input, outputPath, job.Options!);
                     break;
+                }
                 case ProcessingType.Trim:
-                    await ffmpegService.TrimVideoAsync(job.InputFilePaths.First(), outputPath, job.Options!.StartTime!.Value, job.Options.EndTime!.Value);
+                {
+                    if (!job.InputFilePaths.Any())
+                        throw new InvalidOperationException("No input files provided for Trim operation");
+
+                    if (job.Options?.StartTime == null || job.Options.EndTime == null)
+                        throw new InvalidOperationException("Trim operation requires StartTime and EndTime in Options");
+
+                    var input = job.InputFilePaths.First();
+                    await ffmpegService.TrimVideoAsync(input, outputPath, job.Options!.StartTime!.Value, job.Options.EndTime!.Value);
                     break;
+                }
             }
 
             job.Status = JobStatus.Completed;
