@@ -25,8 +25,34 @@ public abstract class IntegrationTestBase : IAsyncLifetime
     {
         await DockerFixture.StartAsync();
         
-        // Ensure API is healthy
+        // Ensure API is healthy - add verbose diagnostics to help debugging intermittent CI failures
+        Console.Error.WriteLine($"[TEST DIAG] Calling health on {DockerFixture.ApiBaseUrl}/health");
         var healthResponse = await ApiClient.HealthCheckAsync();
+
+        Console.Error.WriteLine($"[TEST DIAG] Health response status: {(int)healthResponse.StatusCode} {healthResponse.StatusCode}");
+        try
+        {
+            foreach (var header in healthResponse.Headers)
+            {
+                Console.Error.WriteLine($"[TEST DIAG] Response header: {header.Key} = {string.Join(',', header.Value)}");
+            }
+        }
+        catch { }
+
+        try
+        {
+            var content = await healthResponse.Content.ReadAsStringAsync();
+            Console.Error.WriteLine($"[TEST DIAG] Health response body length: {content?.Length ?? 0}");
+            if (!string.IsNullOrEmpty(content))
+            {
+                Console.Error.WriteLine($"[TEST DIAG] Health response body: {content}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"[TEST DIAG] Failed to read health response body: {ex.Message}");
+        }
+
         healthResponse.IsSuccessStatusCode.Should().BeTrue();
     }
 

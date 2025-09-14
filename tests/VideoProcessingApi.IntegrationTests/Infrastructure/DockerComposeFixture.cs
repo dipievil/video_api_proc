@@ -154,17 +154,34 @@ public class DockerComposeFixture : IDisposable
         var retryCount = 0;
 
         using var httpClient = new HttpClient();
+        // include api key header in health checks in case the app expects it in some environments
+        try
+        {
+            httpClient.DefaultRequestHeaders.Add("X-API-Key", ApiKey);
+        }
+        catch { /* ignore if header cannot be added */ }
         
         while (retryCount < maxRetries)
         {
             try
             {
                 var response = await httpClient.GetAsync($"{ApiBaseUrl}/health");
+
+                // log detailed info to help diagnose intermittent failures
+                var body = string.Empty;
+                try
+                {
+                    body = await response.Content.ReadAsStringAsync();
+                }
+                catch { }
+
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("API health check passed");
+                    _logger.LogInformation("API health check passed (status: {Status})", response.StatusCode);
                     return;
                 }
+
+                _logger.LogWarning("Health check returned non-success status {Status}. Body: {Body}", response.StatusCode, body);
             }
             catch (Exception ex)
             {
