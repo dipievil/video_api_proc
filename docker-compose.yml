@@ -8,12 +8,11 @@ services:
       - "5000:80"
       - "5001:443"
     volumes:
-      - ./uploads:/app/uploads
-      - ./processed:/app/processed
+      - ./src/appsettings.docker.json:/app/appsettings.json:ro
       - ./db:/app/db
       - ./logs:/app/logs
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Docker
       - ASPNETCORE_HTTP_PORTS=80
       - ConnectionStrings__APIDBConnection=Data Source=/app/db/jobs.db
       - FFmpeg__BinaryPath=/usr/bin/ffmpeg
@@ -29,11 +28,22 @@ services:
       timeout: 10s
       retries: 3
 
-  ffmpeg:
-    image: jrottenberg/ffmpeg:4.4-alpine
-    container_name: viprocAPI_ffmpeg
-    command: ["sleep", "infinity"]
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9005:9000" 
+      - "9006:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin123
+      - MINIO_REGION_NAME=us-east-1
+    command: server /data --console-address ":9001"
     volumes:
-      - ./uploads:/uploads
-      - ./processed:/processed
+      - minio_test_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
