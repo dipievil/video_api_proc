@@ -116,7 +116,18 @@ public class JobService : IJobService
             return null;
         }
 
-        return await _fileService.GetFileStreamAsync(job.OutputFilePath);
+        // Normalize path: if OutputFilePath is relative like "processed/<id>.mp4",
+        // join with configured ProcessedPath
+        var outputPath = job.OutputFilePath;
+        if (!Path.IsPathRooted(outputPath))
+        {
+            var processedDir = string.IsNullOrWhiteSpace(_apiSettings.ProcessedPath)
+                ? Path.Combine(AppContext.BaseDirectory, "processed")
+                : _apiSettings.ProcessedPath;
+            outputPath = Path.Combine(processedDir, outputPath.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        }
+
+        return await _fileService.GetFileStreamAsync(outputPath);
     }
 
     public async Task CleanupExpiredJobsAsync()

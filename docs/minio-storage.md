@@ -11,7 +11,7 @@ Esta API suporta dois tipos de storage para arquivos: sistema de arquivos local 
   "Storage": {
     "Provider": "FileSystem",
     "FileSystem": {
-      "BasePath": "./"
+      "BasePath": "./videos_cache"
     }
   }
 }

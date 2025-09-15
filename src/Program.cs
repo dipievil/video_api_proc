@@ -162,6 +162,7 @@ using (var scope = app.Services.CreateScope())
 // Middleware pipeline
 if (app.Environment.IsDevelopment())
 {
+    Log.Information("Environment is Development - enabling Swagger UI");
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {

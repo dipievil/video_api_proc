@@ -9,7 +9,7 @@ public class StorageSettings
 
 public class FileSystemStorageSettings
 {
-    public string BasePath { get; set; } = "./";
+    public string BasePath { get; set; } = "./videos_cache";
 }
 
 public class MinIOStorageSettings

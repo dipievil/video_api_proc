@@ -108,7 +108,14 @@ public class VideoProcessingBackgroundService : BackgroundService
             job.StartedAt = DateTime.UtcNow;
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            var outputPath = Path.Combine("processed", $"{job.Id}.mp4");
+            // Resolve processed directory from Api settings; fallback to ./processed if empty
+            var apiSettings = _serviceProvider.GetRequiredService<IOptions<ApiSettings>>().Value;
+            var processedDir = string.IsNullOrWhiteSpace(apiSettings.ProcessedPath)
+                ? Path.Combine(AppContext.BaseDirectory, "processed")
+                : apiSettings.ProcessedPath;
+
+            Directory.CreateDirectory(processedDir);
+            var outputPath = Path.Combine(processedDir, $"{job.Id}.mp4");
             
             switch (job.ProcessingType)
             {

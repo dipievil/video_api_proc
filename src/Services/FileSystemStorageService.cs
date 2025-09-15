@@ -19,7 +19,7 @@ public class FileSystemStorageService : IStorageService
 
     public async Task<string> SaveFileAsync(IFormFile file, string directory)
     {
-        var fullDirectory = Path.Combine(_settings.BasePath, directory);
+        var fullDirectory = ResolveDirectory(directory);
         if (!Directory.Exists(fullDirectory))
         {
             Directory.CreateDirectory(fullDirectory);
@@ -32,13 +32,13 @@ public class FileSystemStorageService : IStorageService
         await file.CopyToAsync(stream);
 
         _logger.LogInformation("File saved to filesystem: {FilePath}", filePath);
-    // Return absolute path so downstream consumers (eg. FFmpeg) can access the file
-    return Path.GetFullPath(filePath);
+        // Return absolute path so downstream consumers (eg. FFmpeg) can access the file
+        return Path.GetFullPath(filePath);
     }
 
     public async Task<string> SaveFileAsync(Stream fileStream, string fileName, string directory)
     {
-        var fullDirectory = Path.Combine(_settings.BasePath, directory);
+        var fullDirectory = ResolveDirectory(directory);
         if (!Directory.Exists(fullDirectory))
         {
             Directory.CreateDirectory(fullDirectory);
@@ -51,8 +51,8 @@ public class FileSystemStorageService : IStorageService
         await fileStream.CopyToAsync(fileStreamOut);
 
         _logger.LogInformation("File saved to filesystem: {FilePath}", filePath);
-    // Return absolute path so downstream consumers (eg. FFmpeg) can access the file
-    return Path.GetFullPath(filePath);
+        // Return absolute path so downstream consumers (eg. FFmpeg) can access the file
+        return Path.GetFullPath(filePath);
     }
 
     public async Task<bool> DeleteFileAsync(string filePath)
@@ -94,7 +94,8 @@ public class FileSystemStorageService : IStorageService
 
     public string GetFullPath(string directory, string fileName)
     {
-        return Path.Combine(_settings.BasePath, directory, fileName);
+        var dir = ResolveDirectory(directory);
+        return Path.Combine(dir, fileName);
     }
 
     private string GetFullPath(string relativePath)
@@ -103,7 +104,36 @@ public class FileSystemStorageService : IStorageService
         {
             return relativePath;
         }
+
+        // Normalize and avoid double-prepending BasePath
+        var baseAbs = Path.GetFullPath(_settings.BasePath);
+        var relAbs = Path.GetFullPath(Path.Combine(baseAbs, relativePath));
+        if (relAbs.StartsWith(baseAbs, StringComparison.OrdinalIgnoreCase))
+        {
+            return relAbs;
+        }
+
         return Path.Combine(_settings.BasePath, relativePath);
+    }
+
+    private string ResolveDirectory(string directory)
+    {
+        // If absolute, use as-is
+        if (Path.IsPathRooted(directory))
+        {
+            return directory;
+        }
+
+        var baseAbs = Path.GetFullPath(_settings.BasePath);
+        var dirAbs = Path.GetFullPath(directory);
+
+        // If directory already contains the BasePath prefix (even if relative), return it
+        if (dirAbs.StartsWith(baseAbs, StringComparison.OrdinalIgnoreCase))
+        {
+            return dirAbs;
+        }
+
+        return Path.Combine(_settings.BasePath, directory);
     }
 
     private string GetRelativePath(string fullPath)
