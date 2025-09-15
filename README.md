@@ -424,6 +424,27 @@ dotnet run --project src/
 dotnet watch --project src/
 ```
 
+## 🔄 CI/CD Quality Pipelines
+
+This project includes automated GitHub Actions workflows that run on self-hosted runners:
+
+### Build Pipeline
+- **Trigger**: All pushes to `main` and `develop` branches
+- **Purpose**: Validates application builds successfully
+- **Runner**: Self-hosted
+
+### Unit Tests Pipeline
+- **Trigger**: Pull requests to `main` and `develop` branches  
+- **Purpose**: Runs all unit tests to ensure code quality
+- **Runner**: Self-hosted
+
+### Integration Tests Pipeline
+- **Trigger**: Pull requests to `main` and `develop` branches
+- **Purpose**: Runs full integration tests with Docker services
+- **Runner**: Self-hosted
+
+> 📖 **For detailed workflow documentation**, see [GitHub Actions Guide](docs/github-actions.md)
+
 ## 📞 Support
 
 - **Logs**: `docker-compose logs -f video-processing-api`
