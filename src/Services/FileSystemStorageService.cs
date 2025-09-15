@@ -100,7 +100,7 @@ public class FileSystemStorageService : IStorageService
 
     public async Task<List<string>> ListFilesAsync(string directory)
     {
-        Task<List<string>> task = new(() =>
+        return await Task.Run(() =>
         { 
             var fullDirectory = ResolveDirectory(directory);
             if (!Directory.Exists(fullDirectory))
@@ -114,9 +114,6 @@ public class FileSystemStorageService : IStorageService
 
             return files;
         });
-        
-        task.Start();
-        return await task;
     }
 
     private string GetFullPath(string relativePath)
