@@ -155,14 +155,14 @@ public class JobService : IJobService
         var uploadFiles = await _fileService.ListFilesAsync(_apiSettings.UploadsPath);
         var processedFiles = await _fileService.ListFilesAsync(_apiSettings.ProcessedPath);
         
-        var allJobFilesHashSet = expiredJobs
+        var jobFiles = expiredJobs
             .SelectMany(j => j.InputFilePaths)
             .Concat(expiredJobs.Where(j => !string.IsNullOrEmpty(j.OutputFilePath)).Select(j => j.OutputFilePath!))
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        var allOrphanFilesHashSet = uploadFiles.Concat(processedFiles).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var allFiles = uploadFiles.Concat(processedFiles).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        var orphanFiles = allOrphanFilesHashSet.Where(f => !allJobFilesHashSet.Contains(f)).ToList();
+        var orphanFiles = allFiles.Where(f => !jobFiles.Contains(f)).ToList();
 
         foreach (var orphan in orphanFiles)
         {
