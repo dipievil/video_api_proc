@@ -47,7 +47,7 @@ public class CleanupBackgroundService : BackgroundService
 
     private async Task WaitForDatabaseAsync(CancellationToken cancellationToken)
     {
-        var maxRetries = 30; // 30 attempts, 2 seconds each = 1 minute max
+        var maxRetries = 30;
         var retryCount = 0;
         
         while (retryCount < maxRetries && !cancellationToken.IsCancellationRequested)
@@ -57,7 +57,6 @@ public class CleanupBackgroundService : BackgroundService
                 using var scope = _serviceProvider.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<JobDbContext>();
                 
-                // Try to query the database to check if it's ready
                 await dbContext.Jobs.AnyAsync(cancellationToken);
                 
                 _logger.LogInformation("Database is ready for cleanup service");

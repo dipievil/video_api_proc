@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using VideoProcessingApi.Configuration;
@@ -37,7 +39,7 @@ public class JobService : IJobService
             Options = request.Options,
             Status = JobStatus.Pending,
             CreatedBy = apiKey,
-            InputFilePaths = new List<string>()
+            InputFilePaths = []
         };
 
         // Save uploaded files
@@ -139,17 +141,32 @@ public class JobService : IJobService
 
         foreach (var job in expiredJobs)
         {
-            // Delete input files
             foreach (var inputFile in job.InputFilePaths)
             {
                 await _fileService.DeleteFileAsync(inputFile);
             }
 
-            // Delete output file
             if (!string.IsNullOrEmpty(job.OutputFilePath))
             {
                 await _fileService.DeleteFileAsync(job.OutputFilePath);
             }
+        }
+
+        var uploadFiles = await _fileService.ListFilesAsync(_apiSettings.UploadsPath);
+        var processedFiles = await _fileService.ListFilesAsync(_apiSettings.ProcessedPath);
+        
+        var jobFiles = expiredJobs
+            .SelectMany(j => j.InputFilePaths)
+            .Concat(expiredJobs.Where(j => !string.IsNullOrEmpty(j.OutputFilePath)).Select(j => j.OutputFilePath!))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var allFiles = uploadFiles.Concat(processedFiles).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var orphanFiles = allFiles.Where(f => !jobFiles.Contains(f)).ToList();
+
+        foreach (var orphan in orphanFiles)
+        {
+            await _fileService.DeleteFileAsync(orphan);
         }
 
         _context.Jobs.RemoveRange(expiredJobs);
