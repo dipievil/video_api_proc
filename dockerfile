@@ -27,7 +27,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Criar diretórios necessários
-RUN mkdir -p /app/videos_cache/uploads /app/videos_cache/processed /app/db /app/logs && \
-    chmod 755 /app/videos_cache/uploads /app/videos_cache/processed /app/db /app/logs
+RUN mkdir -p /app/db /app/logs && \
+    chmod 755 /app/db /app/logs
 
 ENTRYPOINT ["dotnet", "video_api_proc.dll"]
