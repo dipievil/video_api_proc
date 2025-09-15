@@ -115,7 +115,31 @@ public class MinIOStorageService : IStorageService
         return GetObjectName(directory, fileName);
     }
 
-    private async Task EnsureBucketExistsAsync()
+    public async Task<List<string>> ListFilesAsync(string directory)
+    {
+        try
+        {
+            var objects = new List<string>();
+            var listArgs = new ListObjectsArgs()
+                .WithBucket(_settings.BucketName)
+                .WithPrefix(directory.Trim('/') + "/")
+                .WithRecursive(true);
+
+            var observable = _minioClient.ListObjectsEnumAsync(listArgs);
+            await foreach (var item in observable)
+            {
+                objects.Add(item.Key);
+            }
+
+            return objects;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to list files in MinIO directory: {Directory}", directory);
+            throw;
+        }
+    }
+        private async Task EnsureBucketExistsAsync()
     {
         if (!_settings.CreateBucketIfNotExists)
             return;
@@ -129,7 +153,7 @@ public class MinIOStorageService : IStorageService
             {
                 await _minioClient.MakeBucketAsync(new MakeBucketArgs()
                     .WithBucket(_settings.BucketName));
-                
+
                 _logger.LogInformation("Created MinIO bucket: {BucketName}", _settings.BucketName);
             }
         }

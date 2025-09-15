@@ -8,4 +8,5 @@ public interface IStorageService
     Task<Stream> GetFileStreamAsync(string filePath);
     Task<bool> FileExistsAsync(string filePath);
     string GetFullPath(string directory, string fileName);
+    Task<List<string>> ListFilesAsync(string directory);
 }

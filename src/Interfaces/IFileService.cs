@@ -8,4 +8,5 @@ public interface IFileService
     bool ValidateFileType(IFormFile file, string[] allowedTypes);
     bool ValidateFileSize(IFormFile file, long maxSizeBytes);
     Task<Stream> GetFileStreamAsync(string filePath);
+    Task<List<string>> ListFilesAsync(string directory);
 }

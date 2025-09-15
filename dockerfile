@@ -18,8 +18,6 @@ RUN dotnet build "video_api_proc.csproj" -c Release -o /app/build
 
 FROM build AS publish
 
-# For containers prefer framework-dependent deployment. Force SelfContained=false
-# to avoid NETSDK1067 (SelfContained requires UseAppHost=true).
 RUN dotnet publish "video_api_proc.csproj" -c Release -o /app/publish /p:UseAppHost=false /p:SelfContained=false /p:PublishSingleFile=false
 
 FROM base AS final

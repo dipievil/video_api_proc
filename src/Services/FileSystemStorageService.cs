@@ -32,7 +32,7 @@ public class FileSystemStorageService : IStorageService
         await file.CopyToAsync(stream);
 
         _logger.LogInformation("File saved to filesystem: {FilePath}", filePath);
-        // Return absolute path so downstream consumers (eg. FFmpeg) can access the file
+
         return Path.GetFullPath(filePath);
     }
 
@@ -51,7 +51,7 @@ public class FileSystemStorageService : IStorageService
         await fileStream.CopyToAsync(fileStreamOut);
 
         _logger.LogInformation("File saved to filesystem: {FilePath}", filePath);
-        // Return absolute path so downstream consumers (eg. FFmpeg) can access the file
+
         return Path.GetFullPath(filePath);
     }
 
@@ -98,6 +98,27 @@ public class FileSystemStorageService : IStorageService
         return Path.Combine(dir, fileName);
     }
 
+    public async Task<List<string>> ListFilesAsync(string directory)
+    {
+        Task<List<string>> task = new(() =>
+        { 
+            var fullDirectory = ResolveDirectory(directory);
+            if (!Directory.Exists(fullDirectory))
+            {
+                return [];
+            }
+
+            var files = Directory.GetFiles(fullDirectory)
+                .Select(f => GetRelativePath(f))
+                .ToList();
+
+            return files;
+        });
+        
+        task.Start();
+        return await task;
+    }
+
     private string GetFullPath(string relativePath)
     {
         if (Path.IsPathRooted(relativePath))
@@ -105,7 +126,6 @@ public class FileSystemStorageService : IStorageService
             return relativePath;
         }
 
-        // Normalize and avoid double-prepending BasePath
         var baseAbs = Path.GetFullPath(_settings.BasePath);
         var relAbs = Path.GetFullPath(Path.Combine(baseAbs, relativePath));
         if (relAbs.StartsWith(baseAbs, StringComparison.OrdinalIgnoreCase))
@@ -118,7 +138,7 @@ public class FileSystemStorageService : IStorageService
 
     private string ResolveDirectory(string directory)
     {
-        // If absolute, use as-is
+
         if (Path.IsPathRooted(directory))
         {
             return directory;
@@ -127,7 +147,6 @@ public class FileSystemStorageService : IStorageService
         var baseAbs = Path.GetFullPath(_settings.BasePath);
         var dirAbs = Path.GetFullPath(directory);
 
-        // If directory already contains the BasePath prefix (even if relative), return it
         if (dirAbs.StartsWith(baseAbs, StringComparison.OrdinalIgnoreCase))
         {
             return dirAbs;

@@ -36,6 +36,11 @@ public class FileService : IFileService
         return await _storageService.DeleteFileAsync(filePath);
     }
 
+    public async Task<List<string>> ListFilesAsync(string directory)
+    {
+        return await _storageService.ListFilesAsync(directory);
+    }
+
     public bool ValidateFileType(IFormFile file, string[] allowedTypes)
     {
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();

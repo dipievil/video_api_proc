@@ -9,7 +9,7 @@ public class VideoJob
     public Guid Id { get; set; } 
     public JobStatus Status { get; set; }
     public ProcessingType ProcessingType { get; set; }
-    public List<string> InputFilePaths { get; set; } = new();
+    public List<string> InputFilePaths { get; set; } = [];
     public string? OutputFilePath { get; set; }
     public string? ErrorMessage { get; set; }
     public ProcessingOptions? Options { get; set; }
@@ -19,8 +19,7 @@ public class VideoJob
     public string? CreatedBy { get; set; }     public long? OutputFileSizeBytes { get; set; }
     public TimeSpan? ProcessingDuration { get; set; }
     public int RetryCount { get; set; } = 0;
-    public bool IsCanceled { get; set; } = false;
-    
+    public bool IsCanceled { get; set; } = false;    
     
     public List<ProcessingOperation> Operations { get; set; } = new();
 }
